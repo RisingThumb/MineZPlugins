@@ -1,4 +1,12 @@
 # MineZPlugins
+## What is this?
+
+Source code for a set of MineZ Plugins that can be easily maintained for the UTC Drill Server.
+
+## Contributing
+
+To contribute, add source code to the relevant source folders. Documenting the changes in Git and commenting this code should be done.
+
 ## To do list
 - [ ] Drinking potions consumes the bottle
 - [ ] Grenades
