@@ -22,3 +22,4 @@ To contribute, add source code to the relevant source folders. Documenting the c
 - [ ] Antidote/infection
 - [ ] Zombie/Pigman spawning correctly
 - [ ] Healing friends with bandages
+- [ ] Kill messages
