@@ -11,15 +11,15 @@ import com.google.inject.Inject;
 import co.odsilvert.dsmz.main.DSMZ;
 
 public class PotionsRemove {
-
-    private DSMZ plugin;
-
+	
+	private DSMZ plugin;
+	
     @Inject
     public PotionsRemove(DSMZ plugin) {
         this.plugin = plugin;
     }
 
-    public void action(PlayerItemConsumeEvent event) {
+	public void action(PlayerItemConsumeEvent event) {
         Player player = event.getPlayer();
         ItemStack item = event.getItem();
         int itemSlot = player.getInventory().getHeldItemSlot();
@@ -32,9 +32,9 @@ public class PotionsRemove {
                 deleteConsumedItem(player, Material.BUCKET, itemSlot);
                 break;
             default:
-                break;
+            	break;
         }
-    }
+	}
     private void deleteConsumedItem(Player player, Material itemType, int slot) {
         BukkitRunnable deleteItem = new BukkitRunnable() {
             @Override
@@ -47,7 +47,7 @@ public class PotionsRemove {
             }
         };
 
-        deleteItem.runTaskLater(plugin, 1L);
+        deleteItem.runTaskLater(this.plugin, 1L);
     }
 
 }
