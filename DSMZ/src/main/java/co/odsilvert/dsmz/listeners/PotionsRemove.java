@@ -1,24 +1,27 @@
-package me.silver.mzpotions;
+package co.odsilvert.dsmz.listeners;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class PotionListener implements Listener {
+import com.google.inject.Inject;
 
-    private MineZPotions plugin = MineZPotions.getPlugin();
+import co.odsilvert.dsmz.main.DSMZ;
 
-    @EventHandler
-    public void onPotionConsume(PlayerItemConsumeEvent e) {
-        Player player = e.getPlayer();
-        ItemStack item = e.getItem();
+public class PotionsRemove {
+	
+	@Inject
+	private DSMZ plugin;
+	
+	public PotionsRemove() {
+	}
+
+	public void action(PlayerItemConsumeEvent event) {
+        Player player = event.getPlayer();
+        ItemStack item = event.getItem();
         int itemSlot = player.getInventory().getHeldItemSlot();
-
-//        player.sendMessage(item.getType().toString());
 
         switch (item.getType()) {
             case POTION:
@@ -27,9 +30,10 @@ public class PotionListener implements Listener {
             case MILK_BUCKET:
                 deleteConsumedItem(player, Material.BUCKET, itemSlot);
                 break;
+            default:
+            	break;
         }
-    }
-
+	}
     private void deleteConsumedItem(Player player, Material itemType, int slot) {
         BukkitRunnable deleteItem = new BukkitRunnable() {
             @Override
@@ -42,6 +46,7 @@ public class PotionListener implements Listener {
             }
         };
 
-        deleteItem.runTaskLater(plugin, 1L);
+        deleteItem.runTaskLater(this.plugin, 1L);
     }
+
 }
