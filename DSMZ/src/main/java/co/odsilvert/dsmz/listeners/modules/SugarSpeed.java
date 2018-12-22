@@ -27,10 +27,9 @@ public class SugarSpeed {
         this.plugin = plugin;
 	}
 
-	@SuppressWarnings("deprecation")
 	public void speedEffectTriggered(Player player) {
     	
-    	player.setItemInHand(null);
+		player.getInventory().setItemInMainHand(null);
 		sugarUsed.put(player.getUniqueId(), true);
     	
     	// This is a task for resetting the UUID
