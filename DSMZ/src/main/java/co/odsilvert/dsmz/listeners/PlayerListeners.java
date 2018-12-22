@@ -6,9 +6,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 
+import com.google.inject.Inject;
+
 public class PlayerListeners implements Listener {
-	
+	@Inject
 	private PotionsRemove potionsremove = new PotionsRemove();
+	@Inject
     private SugarSpeed sugarspeed = new SugarSpeed();
     
     

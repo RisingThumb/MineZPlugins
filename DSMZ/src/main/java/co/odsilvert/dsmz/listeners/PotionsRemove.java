@@ -46,7 +46,7 @@ public class PotionsRemove {
             }
         };
 
-        deleteItem.runTaskLater(plugin, 1L);
-}
+        deleteItem.runTaskLater(this.plugin, 1L);
+    }
 
 }

@@ -20,9 +20,10 @@ public class SugarSpeed {
 	
 	@Inject
 	private DSMZ plugin;
+	
 	private HashMap<UUID, Boolean> sugarUsed = new HashMap<>();
 	
-    public SugarSpeed() {
+	public SugarSpeed() {
 	}
 
 	@SuppressWarnings("deprecation")
@@ -49,8 +50,8 @@ public class SugarSpeed {
     	
     	PotionEffect speedEffect = new PotionEffect(PotionEffectType.SPEED, 600, 1);
 		player.addPotionEffect(speedEffect);
-		slownessTask.runTaskLater(plugin, 600L);
-		resetTask.runTaskLater(plugin, 1000L);
+		slownessTask.runTaskLater(this.plugin, 600L);
+		resetTask.runTaskLater(this.plugin, 1000L);
     }
     
     public void action(PlayerInteractEvent event) {
@@ -76,5 +77,4 @@ public class SugarSpeed {
     		}
     	}
     }
-
 }
