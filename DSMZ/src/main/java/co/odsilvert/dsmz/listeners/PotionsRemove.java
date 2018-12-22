@@ -10,7 +10,14 @@ import co.odsilvert.dsmz.main.DSMZ;
 
 public class PotionsRemove {
 	
-	private DSMZ plugin = DSMZ.getPlugin();
+	private DSMZ plugin;
+	
+	public PotionsRemove() {
+	}
+	
+	public void setPlugin(DSMZ plugin) {
+    	this.plugin = plugin;
+    }
 
 	public void action(PlayerItemConsumeEvent event) {
         Player player = event.getPlayer();

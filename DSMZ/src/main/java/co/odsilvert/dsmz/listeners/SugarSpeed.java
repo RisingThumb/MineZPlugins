@@ -16,10 +16,17 @@ import co.odsilvert.dsmz.main.DSMZ;
 
 public class SugarSpeed {
 	
-	private DSMZ plugin = DSMZ.getPlugin();
+	private DSMZ plugin;
 	private HashMap<UUID, Boolean> sugarUsed = new HashMap<>();
 	
-    @SuppressWarnings("deprecation")
+    public SugarSpeed() {
+	}
+    
+    public void setPlugin(DSMZ plugin) {
+    	this.plugin = plugin;
+    }
+
+	@SuppressWarnings("deprecation")
 	public void speedEffectTriggered(Player player) {
     	
     	player.setItemInHand(null);

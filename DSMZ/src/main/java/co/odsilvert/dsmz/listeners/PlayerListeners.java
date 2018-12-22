@@ -6,11 +6,21 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 
+import com.google.inject.Inject;
+
+import co.odsilvert.dsmz.main.DSMZ;
+
 public class PlayerListeners implements Listener {
-    
-	// All singletons here
+	
+	private PotionsRemove potionsremove = new PotionsRemove();
     private SugarSpeed sugarspeed = new SugarSpeed();
-    private PotionsRemove potionsremove = new PotionsRemove();
+    
+    @Inject
+    public PlayerListeners(DSMZ plugin) {
+        // This should be changed to a loop at some point
+        potionsremove.setPlugin(plugin);
+        sugarspeed.setPlugin(plugin);
+    }
     
     
 	@EventHandler(priority=EventPriority.HIGH)

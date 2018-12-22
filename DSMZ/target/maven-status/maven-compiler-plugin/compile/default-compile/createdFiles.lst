@@ -1,2 +1,9 @@
-co/odsilvert/dsmz/main/DSMZ.class
-co/odsilvert/dsmz/listeners/PlayerListeners.class
+co\odsilvert\dsmz\listeners\PotionsRemove.class
+co\odsilvert\dsmz\listeners\SugarSpeed$1.class
+co\odsilvert\dsmz\listeners\SugarSpeed.class
+util\BinderModule.class
+co\odsilvert\dsmz\listeners\PlayerListeners.class
+co\odsilvert\dsmz\listeners\PotionsRemove$2.class
+co\odsilvert\dsmz\main\DSMZ.class
+co\odsilvert\dsmz\listeners\SugarSpeed$2.class
+co\odsilvert\dsmz\listeners\PotionsRemove$1.class
