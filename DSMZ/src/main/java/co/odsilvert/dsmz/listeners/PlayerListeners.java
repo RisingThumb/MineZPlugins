@@ -9,6 +9,10 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 
 import com.google.inject.Inject;
 
+import co.odsilvert.dsmz.listeners.modules.KillMessages;
+import co.odsilvert.dsmz.listeners.modules.PotionsRemove;
+import co.odsilvert.dsmz.listeners.modules.SugarSpeed;
+
 public class PlayerListeners implements Listener {
 	
 	private PotionsRemove potionsRemove;
