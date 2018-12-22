@@ -1,10 +1,13 @@
 co\odsilvert\dsmz\listeners\modules\SugarSpeed.class
 co\odsilvert\dsmz\listeners\modules\PotionsRemove$1.class
-util\BinderModule.class
 co\odsilvert\dsmz\listeners\PlayerListeners.class
 co\odsilvert\dsmz\listeners\modules\SugarSpeed$1.class
 co\odsilvert\dsmz\main\DSMZ.class
 co\odsilvert\dsmz\listeners\modules\PotionsRemove.class
-co\odsilvert\dsmz\listeners\modules\KillMessages.class
+co\odsilvert\dsmz\listeners\modules\FlashGrenadeListener$1.class
 co\odsilvert\dsmz\listeners\modules\PotionsRemove$2.class
 co\odsilvert\dsmz\listeners\modules\SugarSpeed$2.class
+util\BinderModule.class
+co\odsilvert\dsmz\listeners\modules\FlashGrenadeListener.class
+co\odsilvert\dsmz\listeners\modules\KillMessages.class
+co\odsilvert\dsmz\listeners\modules\GrenadeListener.class
