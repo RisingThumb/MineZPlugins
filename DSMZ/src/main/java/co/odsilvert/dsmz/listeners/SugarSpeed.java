@@ -12,19 +12,18 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.google.inject.Inject;
+
 import co.odsilvert.dsmz.main.DSMZ;
 
 public class SugarSpeed {
 	
+	@Inject
 	private DSMZ plugin;
 	private HashMap<UUID, Boolean> sugarUsed = new HashMap<>();
 	
     public SugarSpeed() {
 	}
-    
-    public void setPlugin(DSMZ plugin) {
-    	this.plugin = plugin;
-    }
 
 	@SuppressWarnings("deprecation")
 	public void speedEffectTriggered(Player player) {

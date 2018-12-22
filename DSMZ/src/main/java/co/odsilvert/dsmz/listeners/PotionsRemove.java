@@ -6,18 +6,17 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.google.inject.Inject;
+
 import co.odsilvert.dsmz.main.DSMZ;
 
 public class PotionsRemove {
 	
+	@Inject
 	private DSMZ plugin;
 	
 	public PotionsRemove() {
 	}
-	
-	public void setPlugin(DSMZ plugin) {
-    	this.plugin = plugin;
-    }
 
 	public void action(PlayerItemConsumeEvent event) {
         Player player = event.getPlayer();
