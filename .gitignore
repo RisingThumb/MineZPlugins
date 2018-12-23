@@ -1,0 +1,6 @@
+
+DSMZ/.idea/
+DSMZ/target/
+dependency-reduced-pom.xml
+.directory
+*.iml
