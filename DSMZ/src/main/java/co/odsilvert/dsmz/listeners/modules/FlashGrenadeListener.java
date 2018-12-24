@@ -53,24 +53,20 @@ public class FlashGrenadeListener {
 
 	public void action(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
-		Action action = event.getAction();
-		if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) && event.getHand() == EquipmentSlot.HAND) {
-			if (player.getEquipment().getItemInMainHand().getType() == Material.SLIME_BALL) {
-				
-				player.getInventory().setItemInMainHand(null);
-				final Item flashGrenade = player.getWorld().dropItem(player.getEyeLocation().add(0, 0, 0), new ItemStack(Material.SLIME_BALL));
-				flashGrenade.setInvulnerable(true);
-				flashGrenade.setPickupDelay(32767);
-				
-				Location playerLoct = player.getEyeLocation();
-				playerLoct.setPitch(playerLoct.getPitch()-30);
-				
-				flashGrenade.setVelocity(playerLoct.getDirection());
-				explode(flashGrenade);
-				
-			}
+		if (player.getEquipment().getItemInMainHand().getType() == Material.SLIME_BALL) {
+
+			player.getInventory().setItemInMainHand(null);
+			final Item flashGrenade = player.getWorld().dropItem(player.getEyeLocation().add(0, 0, 0), new ItemStack(Material.SLIME_BALL));
+			flashGrenade.setInvulnerable(true);
+			flashGrenade.setPickupDelay(32767);
+
+			Location playerLoct = player.getEyeLocation();
+			playerLoct.setPitch(playerLoct.getPitch()-30);
+
+			flashGrenade.setVelocity(playerLoct.getDirection());
+			explode(flashGrenade);
+
 		}
-		
 	}
 
 }

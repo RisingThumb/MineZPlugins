@@ -9,8 +9,6 @@ import util.BinderModule;
 
 public class DSMZ extends JavaPlugin {
 
-//    private static DSMZ plugin;
-
     @Inject
     private PlayerListeners playerListeners;
 

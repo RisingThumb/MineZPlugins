@@ -58,23 +58,20 @@ public class SugarSpeed {
     	Player player = event.getPlayer();
     	Action action = event.getAction();
     	UUID UUID = player.getUniqueId();
-    	
-    	if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) && event.getHand() == EquipmentSlot.HAND) {
 
-    		if (player.getEquipment().getItemInMainHand().getType() == Material.SUGAR) {
-    			// If it doesn't exist in the map, add it to the map and set it to true
-    			if (!(sugarUsed.containsKey(UUID))) {
-    				speedEffectTriggered(player);
-    			}
-    			// Check if the UUID in the map has the object
-    			else if (sugarUsed.get(UUID) == false) {
-    				speedEffectTriggered(player);
-    			}
-    			// If the UUID exists and if it is false, tell the user to wait a while
-    			else {
-    				player.sendMessage("You've used a sugar recently, wait a while before using one again.");
-    			}
-    		}
-    	}
+		if (player.getEquipment().getItemInMainHand().getType() == Material.SUGAR) {
+			// If it doesn't exist in the map, add it to the map and set it to true
+			if (!(sugarUsed.containsKey(UUID))) {
+				speedEffectTriggered(player);
+			}
+			// Check if the UUID in the map has the object
+			else if (!sugarUsed.get(UUID)) {
+				speedEffectTriggered(player);
+			}
+			// If the UUID exists and if it is false, tell the user to wait a while
+			else {
+				player.sendMessage("You've used a sugar recently, wait a while before using one again.");
+			}
+		}
     }
 }
