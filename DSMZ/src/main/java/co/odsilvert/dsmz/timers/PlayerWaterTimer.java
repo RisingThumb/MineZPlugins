@@ -16,28 +16,26 @@ public class PlayerWaterTimer implements Runnable {
 //            = plugin.getInjector().getInstance(PlayerWaterHandler.class);
 
     @Override
-    public void run() {
-        if (!playerWaterHandler.isDisabled) {
-            for (Player player : plugin.getServer().getOnlinePlayers()) {
-                int xp = player.getLevel();
+	public void run() {
+		for (Player player : plugin.getServer().getOnlinePlayers()) {
+			int xp = player.getLevel();
 
-                if (xp > 0) {
-                    playerWaterHandler.setWaterLevel(player, xp - 1);
-                }
+			if (xp > 0) {
+				playerWaterHandler.setWaterLevel(player, xp - 1);
+			}
 
-                switch (xp) {
-                    case 0:
-                        playerWaterHandler.setDehydrating(player, true);
-                        break;
-                    case 5:
-                        player.sendMessage(ChatColor.RED + "You're very thirsty");
-                        break;
-                    case 10:
-                        player.sendMessage(ChatColor.YELLOW + "You're thirsty");
-                        break;
-                }
+			switch (xp) {
+			case 0:
+				playerWaterHandler.setDehydrating(player, true);
+				break;
+			case 5:
+				player.sendMessage(ChatColor.RED + "You're very thirsty");
+				break;
+			case 10:
+				player.sendMessage(ChatColor.YELLOW + "You're thirsty");
+				break;
+			}
 
-            }
-        }
-    }
+		}
+	}
 }

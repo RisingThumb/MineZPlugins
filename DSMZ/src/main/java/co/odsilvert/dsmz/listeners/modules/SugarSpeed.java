@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -55,7 +54,6 @@ public class SugarSpeed {
     
     public void action(PlayerInteractEvent event) {
     	Player player = event.getPlayer();
-    	Action action = event.getAction();
     	UUID UUID = player.getUniqueId();
 
 		if (player.getEquipment().getItemInMainHand().getType() == Material.SUGAR) {

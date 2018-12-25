@@ -4,7 +4,6 @@ import co.odsilvert.dsmz.main.DSMZ;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.ArrayList;
 
@@ -15,8 +14,6 @@ public class PlayerWaterHandler {
     private DSMZ plugin;
 
     private ArrayList<Player> dehydrating = new ArrayList<>();
-
-    public Boolean isDisabled = false;
 
     public void setWaterLevel(Player player, int level) {
         if (level >= 20) {
@@ -37,7 +34,7 @@ public class PlayerWaterHandler {
             dehydrating.remove(player);
         }
     }
-
+    
     public void setDehydrating(Player player, Boolean state, long delay) {
         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
             if (state) {

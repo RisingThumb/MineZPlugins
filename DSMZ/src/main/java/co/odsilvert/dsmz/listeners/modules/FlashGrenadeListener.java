@@ -51,7 +51,7 @@ public class FlashGrenadeListener {
 
 	public void action(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
-		if (player.getItemInHand().getType() == Material.SLIME_BALL) {
+		if (player.getEquipment().getItemInMainHand().getType() == Material.SLIME_BALL) {
 
 			player.getInventory().setItemInMainHand(null);
 			final Item flashGrenade = player.getWorld().dropItem(player.getEyeLocation().add(0, 0, 0), new ItemStack(Material.SLIME_BALL));
