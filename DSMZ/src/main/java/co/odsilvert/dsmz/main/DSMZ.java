@@ -4,12 +4,13 @@ import co.odsilvert.dsmz.listeners.PlayerListeners;
 import co.odsilvert.dsmz.timers.PlayerStatusTimer;
 import co.odsilvert.dsmz.timers.PlayerDehydrationTimer;
 import co.odsilvert.dsmz.timers.PlayerWaterTimer;
+import co.odsilvert.dsmz.util.BinderModule;
+
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
-import util.BinderModule;
 
 public class DSMZ extends JavaPlugin {
 

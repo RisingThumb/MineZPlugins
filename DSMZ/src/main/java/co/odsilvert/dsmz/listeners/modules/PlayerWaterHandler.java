@@ -1,7 +1,5 @@
 package co.odsilvert.dsmz.listeners.modules;
 
-import co.odsilvert.dsmz.main.DSMZ;
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.bukkit.entity.Player;
 
@@ -9,9 +7,6 @@ import java.util.ArrayList;
 
 @Singleton
 public class PlayerWaterHandler {
-
-    @Inject
-    private DSMZ plugin;
 
     private ArrayList<Player> dehydrating = new ArrayList<>();
 
@@ -33,18 +28,6 @@ public class PlayerWaterHandler {
         } else {
             dehydrating.remove(player);
         }
-    }
-    
-    public void setDehydrating(Player player, Boolean state, long delay) {
-        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
-            if (state) {
-                if (!dehydrating.contains(player)) {
-                    dehydrating.add(player);
-                }
-            } else {
-                dehydrating.remove(player);
-            }
-        }, delay);
     }
 
     public ArrayList<Player> getDehydratingPlayers() {

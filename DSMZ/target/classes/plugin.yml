@@ -1,5 +1,6 @@
 name: DrillServerMineZPlugin
-version: 0.0.9
+version: 0.0.12
 main: co.odsilvert.dsmz.main.DSMZ
 authors: [Silver, ODST]
 description: A test plugin for merging all existing features
+api-version: 1.13

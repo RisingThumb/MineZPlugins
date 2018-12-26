@@ -1,6 +1,7 @@
 C:\Users\AAZ\eclipse-workspace\MineZPlugin\src\main\java\co\odsilvert\dsmz\timers\PlayerWaterTimer.java
 C:\Users\AAZ\eclipse-workspace\MineZPlugin\src\main\java\co\odsilvert\dsmz\listeners\modules\FlashGrenadeListener.java
 C:\Users\AAZ\eclipse-workspace\MineZPlugin\src\main\java\co\odsilvert\dsmz\listeners\modules\PotionsRemove.java
+C:\Users\AAZ\eclipse-workspace\MineZPlugin\src\main\java\co\odsilvert\dsmz\util\PlayerDataClass.java
 C:\Users\AAZ\eclipse-workspace\MineZPlugin\src\main\java\co\odsilvert\dsmz\listeners\modules\SugarSpeed.java
 C:\Users\AAZ\eclipse-workspace\MineZPlugin\src\main\java\co\odsilvert\dsmz\listeners\modules\KillMessages.java
 C:\Users\AAZ\eclipse-workspace\MineZPlugin\src\main\java\co\odsilvert\dsmz\timers\PlayerDehydrationTimer.java
@@ -8,7 +9,7 @@ C:\Users\AAZ\eclipse-workspace\MineZPlugin\src\main\java\co\odsilvert\dsmz\liste
 C:\Users\AAZ\eclipse-workspace\MineZPlugin\src\main\java\co\odsilvert\dsmz\timers\PlayerStatusTimer.java
 C:\Users\AAZ\eclipse-workspace\MineZPlugin\src\main\java\co\odsilvert\dsmz\listeners\modules\BandageItem.java
 C:\Users\AAZ\eclipse-workspace\MineZPlugin\src\main\java\co\odsilvert\dsmz\main\DSMZ.java
+C:\Users\AAZ\eclipse-workspace\MineZPlugin\src\main\java\co\odsilvert\dsmz\util\BinderModule.java
 C:\Users\AAZ\eclipse-workspace\MineZPlugin\src\main\java\co\odsilvert\dsmz\listeners\modules\PlayerWaterHandler.java
-C:\Users\AAZ\eclipse-workspace\MineZPlugin\src\main\java\util\BinderModule.java
 C:\Users\AAZ\eclipse-workspace\MineZPlugin\src\main\java\co\odsilvert\dsmz\listeners\PlayerListeners.java
 C:\Users\AAZ\eclipse-workspace\MineZPlugin\src\main\java\co\odsilvert\dsmz\listeners\modules\GrenadeListener.java

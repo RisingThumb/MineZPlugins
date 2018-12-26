@@ -4,9 +4,7 @@ import co.odsilvert.dsmz.listeners.modules.*;
 import co.odsilvert.dsmz.main.DSMZ;
 
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -102,9 +100,7 @@ public class PlayerListeners implements Listener {
         Player player = event.getPlayer();
 
         if (player.getLevel() == 0) {
-            // Start damage timer after an arbitrary amount of time
-        	// Is this really necessary?
-            playerWaterHandler.setDehydrating(player, true, 40L);
+            playerWaterHandler.setDehydrating(player, true);
         }
     }
 
@@ -117,48 +113,7 @@ public class PlayerListeners implements Listener {
     
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
-    	Entity victim = event.getEntity();
-    	Entity damager = event.getDamager();
-    	
-    	if (damager instanceof Player) {
-    		if (victim instanceof Player) {
-    			switch (((Player) damager).getEquipment().getItemInMainHand().getType()) {
-    				case PAPER:
-    					bandageItem.bandageHit((Player) damager, (Player) victim);
-    					event.setCancelled(true);
-    					return;
-    				case SHEARS:
-    					bandageItem.shearHit((Player) damager, (Player) victim);
-    					event.setCancelled(true);
-    					return;
-    				default:
-    					break;
-    			}
-    		}
-    	} 
-    	if (victim instanceof Player) {
-    		Player playerHurt = (Player) victim;
-    		// Bleeding check
-    		{
-	    		int random = (int )(Math.random() * bleedRange + 1);
-	    		if (random == 1) {
-	    			playerStatusHandler.setBleeding(playerHurt, true);
-	    		}
-    		}
-    		
-    		if (damager instanceof Zombie) {
-        		// Bleeding check
-        		{
-    	    		int random = (int )(Math.random() * infectionRange + 1);
-    	    		System.out.println(random);
-    	    		if (random == 1) {
-    	    			playerStatusHandler.setInfected(playerHurt, true);
-    	    		}
-        		}
-    		}
-    		
-    		
-    	}
+    	bandageItem.action(event, bleedRange, infectionRange);
     }
 
     @EventHandler
