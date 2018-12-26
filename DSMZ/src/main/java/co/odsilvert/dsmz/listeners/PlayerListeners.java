@@ -4,6 +4,7 @@ import co.odsilvert.dsmz.listeners.modules.*;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -23,6 +24,7 @@ public class PlayerListeners implements Listener {
 	
 	// Modifiable variables to remove "Magic Numbers"
 	private int bleedRange = 2;
+	private int infectionRange = 2;
 	private int maxWaterLevel = 20;
 	
 
@@ -33,7 +35,7 @@ public class PlayerListeners implements Listener {
 	@Inject private GrenadeListener grenadeListener;
 	@Inject private FlashGrenadeListener flashGrenadeListener;
 	@Inject private PlayerWaterHandler playerWaterHandler;
-	@Inject private PlayerBleedingHandler playerBleedingHandler;
+	@Inject private PlayerStatusHandler playerStatusHandler;
 	@Inject private BandageItem bandageItem;
 //	= plugin.getInjector().getInstance(PlayerWaterHandler.class);
     
@@ -67,7 +69,6 @@ public class PlayerListeners implements Listener {
 
 		switch (item.getType()) {
 			case POTION:
-            case MILK_BUCKET:
 				potionsRemove.action(event);
 				PotionMeta potion = (PotionMeta)item.getItemMeta();
 
@@ -78,6 +79,10 @@ public class PlayerListeners implements Listener {
 					player.sendMessage(ChatColor.BLUE + "Ahh, much better");
 				}
 				break;
+            case MILK_BUCKET:
+				potionsRemove.action(event);
+				playerStatusHandler.setInfected(player, false);
+				player.sendMessage(ChatColor.GREEN + "You feel cured");
 			case GOLDEN_APPLE:
 				// Modify absorption hearts
 				break;
@@ -103,26 +108,34 @@ public class PlayerListeners implements Listener {
     @EventHandler
     public void onPlayerDisconnect(PlayerQuitEvent event) {
 	    Player player = event.getPlayer();
-	    playerBleedingHandler.setBleeding(player, false);
+	    playerStatusHandler.setBleeding(player, false);
         playerWaterHandler.setDehydrating(player, false);
     }
     
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
     	Entity victim = event.getEntity();
-    	System.out.println("DAMAGE DETECTED");
+    	Entity damager = event.getDamager();
     	
     	if (victim instanceof Player) {
     		Player playerHurt = (Player) victim;
-    		System.out.println("PLAYER DETECTED");
     		// Bleeding check
     		{
 	    		int random = (int )(Math.random() * bleedRange + 1);
-	    		System.out.println(random);
 	    		if (random == 1) {
-	    			playerHurt.sendMessage("You start bleeding!");
-	    			playerBleedingHandler.setBleeding(playerHurt, true);
+	    			playerStatusHandler.setBleeding(playerHurt, true);
 	    		}
+    		}
+    		
+    		if (damager instanceof Zombie) {
+        		// Bleeding check
+        		{
+    	    		int random = (int )(Math.random() * infectionRange + 1);
+    	    		System.out.println(random);
+    	    		if (random == 1) {
+    	    			playerStatusHandler.setInfected(playerHurt, true);
+    	    		}
+        		}
     		}
     		
     		
@@ -139,7 +152,6 @@ public class PlayerListeners implements Listener {
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
 	    Player player = event.getPlayer();
-
 	    playerWaterHandler.setWaterLevel(player, maxWaterLevel);
     }
 

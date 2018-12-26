@@ -8,13 +8,13 @@ co\odsilvert\dsmz\main\DSMZ.class
 co\odsilvert\dsmz\timers\PlayerWaterTimer.class
 co\odsilvert\dsmz\listeners\modules\PotionsRemove.class
 co\odsilvert\dsmz\listeners\modules\FlashGrenadeListener$1.class
+co\odsilvert\dsmz\timers\PlayerStatusTimer.class
 co\odsilvert\dsmz\listeners\modules\PotionsRemove$2.class
-co\odsilvert\dsmz\timers\PlayerBleedingTimer.class
 co\odsilvert\dsmz\listeners\modules\SugarSpeed$2.class
-co\odsilvert\dsmz\listeners\modules\PlayerBleedingHandler.class
 util\BinderModule.class
 co\odsilvert\dsmz\listeners\modules\FlashGrenadeListener.class
 co\odsilvert\dsmz\listeners\modules\PlayerWaterHandler.class
 co\odsilvert\dsmz\listeners\modules\KillMessages.class
+co\odsilvert\dsmz\listeners\modules\PlayerStatusHandler.class
 co\odsilvert\dsmz\listeners\PlayerListeners$1.class
 co\odsilvert\dsmz\listeners\modules\GrenadeListener.class

@@ -1,7 +1,7 @@
 package co.odsilvert.dsmz.main;
 
 import co.odsilvert.dsmz.listeners.PlayerListeners;
-import co.odsilvert.dsmz.timers.PlayerBleedingTimer;
+import co.odsilvert.dsmz.timers.PlayerStatusTimer;
 import co.odsilvert.dsmz.timers.PlayerDehydrationTimer;
 import co.odsilvert.dsmz.timers.PlayerWaterTimer;
 import com.google.inject.Inject;
@@ -18,7 +18,7 @@ public class DSMZ extends JavaPlugin {
     @Inject private PlayerListeners playerListeners;
     @Inject private PlayerWaterTimer playerWaterTimer;
     @Inject private PlayerDehydrationTimer playerDehydrationTimer;
-    @Inject private PlayerBleedingTimer playerBleedingTimer;
+    @Inject private PlayerStatusTimer playerBleedingTimer;
 
     @Override
     public void onEnable() {

@@ -7,7 +7,7 @@ import com.google.inject.Inject;
 
 public class BandageItem {
 	
-	@Inject PlayerBleedingHandler playerBleedingHandler;
+	@Inject PlayerStatusHandler playerBleedingHandler;
 	
 	public void action(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
