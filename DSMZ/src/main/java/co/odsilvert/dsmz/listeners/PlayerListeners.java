@@ -1,6 +1,8 @@
 package co.odsilvert.dsmz.listeners;
 
 import co.odsilvert.dsmz.listeners.modules.*;
+import co.odsilvert.dsmz.main.DSMZ;
+
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -19,13 +21,14 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class PlayerListeners implements Listener {
 	
 	// Modifiable variables to remove "Magic Numbers"
-	private int bleedRange = 2;
-	private int infectionRange = 2;
-	private int maxWaterLevel = 20;
+	final private int bleedRange = 2;
+	final private int infectionRange = 2;
+	final private int maxWaterLevel = 20;
 	
 
 	// Constructor parameter list was getting ridiculous
@@ -37,7 +40,7 @@ public class PlayerListeners implements Listener {
 	@Inject private PlayerWaterHandler playerWaterHandler;
 	@Inject private PlayerStatusHandler playerStatusHandler;
 	@Inject private BandageItem bandageItem;
-//	= plugin.getInjector().getInstance(PlayerWaterHandler.class);
+	@Inject private DSMZ plugin;
     
 	@EventHandler
     public void onPlayerInteract(PlayerInteractEvent event){
@@ -117,6 +120,22 @@ public class PlayerListeners implements Listener {
     	Entity victim = event.getEntity();
     	Entity damager = event.getDamager();
     	
+    	if (damager instanceof Player) {
+    		if (victim instanceof Player) {
+    			switch (((Player) damager).getEquipment().getItemInMainHand().getType()) {
+    				case PAPER:
+    					bandageItem.bandageHit((Player) damager, (Player) victim);
+    					event.setCancelled(true);
+    					return;
+    				case SHEARS:
+    					bandageItem.shearHit((Player) damager, (Player) victim);
+    					event.setCancelled(true);
+    					return;
+    				default:
+    					break;
+    			}
+    		}
+    	} 
     	if (victim instanceof Player) {
     		Player playerHurt = (Player) victim;
     		// Bleeding check
@@ -152,7 +171,14 @@ public class PlayerListeners implements Listener {
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
 	    Player player = event.getPlayer();
-	    playerWaterHandler.setWaterLevel(player, maxWaterLevel);
+	    BukkitRunnable respawnTask = new BukkitRunnable() {
+			public void run() {
+				playerWaterHandler.setWaterLevel(player, maxWaterLevel);
+			    playerStatusHandler.setInfected(player, false);
+			    playerStatusHandler.setBleeding(player, false);
+			}
+    	};
+    	respawnTask.runTaskLater(plugin, 5L);
     }
 
 	@EventHandler
