@@ -1,4 +1,4 @@
-package util;
+package co.odsilvert.dsmz.util;
 
 import co.odsilvert.dsmz.main.DSMZ;
 import com.google.inject.AbstractModule;

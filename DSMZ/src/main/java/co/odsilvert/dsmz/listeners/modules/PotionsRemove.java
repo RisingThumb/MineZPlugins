@@ -7,9 +7,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import co.odsilvert.dsmz.main.DSMZ;
 
+@Singleton
 public class PotionsRemove {
 	
 	private DSMZ plugin;

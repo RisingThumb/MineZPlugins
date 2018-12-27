@@ -6,7 +6,7 @@
 
     <groupId>co.odsilvert</groupId>
     <artifactId>DSMZ</artifactId>
-    <version>0.0.9</version>
+    <version>0.0.13</version>
     <name>DrillServerMineZPlugin</name>
 
     <build>

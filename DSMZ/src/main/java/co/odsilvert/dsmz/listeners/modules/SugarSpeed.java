@@ -11,9 +11,11 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import co.odsilvert.dsmz.main.DSMZ;
 
+@Singleton
 public class SugarSpeed {
 	
 	private DSMZ plugin;
