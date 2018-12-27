@@ -4,6 +4,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
+import com.google.inject.Singleton;
+
+@Singleton
 public class KillMessages {
 	
 	public void action(PlayerDeathEvent event) {

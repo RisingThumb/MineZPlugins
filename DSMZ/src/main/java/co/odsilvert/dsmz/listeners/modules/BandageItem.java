@@ -14,10 +14,12 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import co.odsilvert.dsmz.main.DSMZ;
 import co.odsilvert.dsmz.util.PlayerDataClass;
 
+@Singleton
 public class BandageItem {
 	private DSMZ plugin;
 	

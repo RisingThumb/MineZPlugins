@@ -6,7 +6,9 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
+import com.google.inject.Singleton;
 
+@Singleton
 public class GrenadeListener {
 	public void explodeAction(ProjectileHitEvent event) {
 		Projectile projectile = event.getEntity();
