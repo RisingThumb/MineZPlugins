@@ -2,6 +2,7 @@
 DSMZ/.idea/
 DSMZ/target/
 dependency-reduced-pom.xml
+.idea/
 .directory
 *.iml
 *.jar
