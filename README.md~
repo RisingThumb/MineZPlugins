@@ -18,9 +18,9 @@ To contribute, add source code to the relevant source folders. Documenting the c
 - [ ] Ban crafting(sort of)
 - [ ] Introduce some form of kit mechanic with default MineZ kits
 - [ ] Grappling hook that is accurate to MineZ(No horizontal grappling)
-- [x] Bandages/bleeding
+- [ ] Bandages/bleeding
 - [ ] Antidote/infection
 - [ ] Zombie/Pigman spawning correctly
-- [x] Healing friends with bandages
+- [ ] Healing friends with bandages
 - [x] Kill messages
 - [ ] Particle effects for all the stuff
