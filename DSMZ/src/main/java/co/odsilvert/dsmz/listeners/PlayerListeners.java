@@ -125,7 +125,7 @@ public class PlayerListeners implements Listener {
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-	    Player player = event.getPlayer();
+	    final Player player = event.getPlayer();
 	    BukkitRunnable respawnTask = new BukkitRunnable() {
 			public void run() {
 				playerWaterHandler.setWaterLevel(player, maxWaterLevel);

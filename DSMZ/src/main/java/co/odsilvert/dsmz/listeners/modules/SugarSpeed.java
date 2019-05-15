@@ -27,7 +27,7 @@ public class SugarSpeed {
         this.plugin = plugin;
 	}
 
-	public void speedEffectTriggered(Player player) {
+	public void speedEffectTriggered(final Player player) {
     	
 		player.getInventory().setItemInMainHand(null);
 		sugarUsed.put(player.getUniqueId(), true);
