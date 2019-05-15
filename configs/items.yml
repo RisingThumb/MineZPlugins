@@ -1,0 +1,14 @@
+#
+#
+#   Um, hi?
+#
+#
+
+items:
+  - material: ANVIL
+    name: Anvil
+    stack: 3
+    
+  - material: STICK
+    name: 1
+    stack: 1
