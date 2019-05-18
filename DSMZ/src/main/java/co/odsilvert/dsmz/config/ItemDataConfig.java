@@ -35,6 +35,12 @@ public class ItemDataConfig {
             }
 
             String name = dataObjects.get("name").toString();
+            boolean craftable = false;
+
+            if (dataObjects.get("craftable").toString().toLowerCase().equals("true")) {
+                craftable = true;
+            }
+
             int maxStackSize;
 
             try {
@@ -45,18 +51,22 @@ public class ItemDataConfig {
                 maxStackSize = 1;
             }
 
-            ItemData item = new ItemData(material, name, maxStackSize);
+            ItemData item = new ItemData(material, name, craftable, maxStackSize);
 
             /*
                 DEBUG THINGY
              */
-            System.out.printf("Successfully created an item with data: %s, %s, %d", material.name(), name, maxStackSize);
+//            System.out.printf("Successfully created an item with data: %s, %s, %d", material.name(), name, maxStackSize);
             this.itemData.put(material, item);
         }
 
     }
 
     public ItemData getItemData(Material material) {
-        return itemData.get(material);
+        if (itemData.containsKey(material)) {
+            return itemData.get(material);
+        } else {
+            return new ItemData(material, material.toString(), false, 1);
+        }
     }
 }
