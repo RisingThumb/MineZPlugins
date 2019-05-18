@@ -1,6 +1,7 @@
 package co.odsilvert.dsmz.listeners;
 
 import co.odsilvert.dsmz.listeners.modules.*;
+import co.odsilvert.dsmz.listeners.modules.legendaries.LoneSword;
 import co.odsilvert.dsmz.main.DSMZ;
 
 import org.bukkit.ChatColor;
@@ -38,6 +39,7 @@ public class PlayerListeners implements Listener {
 	@Inject private PlayerWaterHandler playerWaterHandler;
 	@Inject private PlayerStatusHandler playerStatusHandler;
 	@Inject private BandageItem bandageItem;
+	@Inject private LoneSword loneSword;
 	@Inject private DSMZ plugin;
     
 	@EventHandler
@@ -57,6 +59,16 @@ public class PlayerListeners implements Listener {
 					break;
 				case PAPER:
 					bandageItem.action(event);
+					break;
+				case IRON_SWORD:
+					if (item.hasItemMeta()){
+						String itemName = player.getEquipment().getItemInMainHand().getItemMeta().getDisplayName();
+
+						if (itemName.equals("Lone Sword")) {
+							loneSword.action(player);
+						}
+					}
+
 				default:
 					break;
 			}
@@ -129,10 +141,11 @@ public class PlayerListeners implements Listener {
 	    BukkitRunnable respawnTask = new BukkitRunnable() {
 			public void run() {
 				playerWaterHandler.setWaterLevel(player, maxWaterLevel);
+				playerWaterHandler.setDehydrating(event.getPlayer(), false);
 			    playerStatusHandler.setInfected(player, false);
 			    playerStatusHandler.setBleeding(player, false);
 			}
-    	};
+	    };
     	respawnTask.runTaskLater(plugin, 5L);
     }
 
