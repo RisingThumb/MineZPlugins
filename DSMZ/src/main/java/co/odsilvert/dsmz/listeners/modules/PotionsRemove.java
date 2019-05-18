@@ -37,7 +37,7 @@ public class PotionsRemove {
             	break;
         }
 	}
-    private void deleteConsumedItem(Player player, Material itemType, int slot) {
+    private void deleteConsumedItem(final Player player, final Material itemType, final int slot) {
         BukkitRunnable deleteItem = new BukkitRunnable() {
             @Override
             public void run() {
