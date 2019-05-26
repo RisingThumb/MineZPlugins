@@ -1,6 +1,7 @@
 package co.odsilvert.dsmz.listeners;
 
 import co.odsilvert.dsmz.listeners.modules.*;
+import co.odsilvert.dsmz.listeners.modules.legendaries.LoneSword;
 import co.odsilvert.dsmz.main.DSMZ;
 
 import org.bukkit.ChatColor;
@@ -22,12 +23,12 @@ import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class PlayerListeners implements Listener {
-	
+
 	// Modifiable variables to remove "Magic Numbers"
 	final private int bleedRange = 2;
 	final private int infectionRange = 2;
 	final private int maxWaterLevel = 20;
-	
+
 
 	// Constructor parameter list was getting ridiculous
 	@Inject private PotionsRemove potionsRemove;
@@ -38,8 +39,9 @@ public class PlayerListeners implements Listener {
 	@Inject private PlayerWaterHandler playerWaterHandler;
 	@Inject private PlayerStatusHandler playerStatusHandler;
 	@Inject private BandageItem bandageItem;
+	@Inject private LoneSword loneSword;
 	@Inject private DSMZ plugin;
-    
+
 	@EventHandler
     public void onPlayerInteract(PlayerInteractEvent event){
     	// All actions for that event would be listed here
@@ -57,6 +59,16 @@ public class PlayerListeners implements Listener {
 					break;
 				case PAPER:
 					bandageItem.action(event);
+					break;
+				case IRON_SWORD:
+					if (item.hasItemMeta()){
+						String itemName = player.getEquipment().getItemInMainHand().getItemMeta().getDisplayName();
+
+						if (itemName.equals("Lone Sword")) {
+							loneSword.action(player);
+						}
+					}
+
 				default:
 					break;
 			}
@@ -87,8 +99,8 @@ public class PlayerListeners implements Listener {
 			case GOLDEN_APPLE:
 				// Modify absorption hearts
 				break;
-				
-			
+
+
 			// Default case to stop eclipse screaming at me
 			default:
 				break;
@@ -110,7 +122,7 @@ public class PlayerListeners implements Listener {
 	    playerStatusHandler.setBleeding(player, false);
         playerWaterHandler.setDehydrating(player, false);
     }
-    
+
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
     	bandageItem.action(event, bleedRange, infectionRange);
@@ -125,14 +137,15 @@ public class PlayerListeners implements Listener {
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-	    Player player = event.getPlayer();
+	    final Player player = event.getPlayer();
 	    BukkitRunnable respawnTask = new BukkitRunnable() {
 			public void run() {
 				playerWaterHandler.setWaterLevel(player, maxWaterLevel);
+				playerWaterHandler.setDehydrating(event.getPlayer(), false);
 			    playerStatusHandler.setInfected(player, false);
 			    playerStatusHandler.setBleeding(player, false);
 			}
-    	};
+	    };
     	respawnTask.runTaskLater(plugin, 5L);
     }
 

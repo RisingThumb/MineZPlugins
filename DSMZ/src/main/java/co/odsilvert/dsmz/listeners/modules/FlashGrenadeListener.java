@@ -28,7 +28,7 @@ public class FlashGrenadeListener {
         this.plugin = plugin;
 	}
 	
-	private void explode(Item flashGrenade) {
+	private void explode(final Item flashGrenade) {
 		BukkitRunnable explodeTask = new BukkitRunnable() {
 			public void run() {
 				List<Entity> nearbyEntities = flashGrenade.getNearbyEntities(5, 5, 5);

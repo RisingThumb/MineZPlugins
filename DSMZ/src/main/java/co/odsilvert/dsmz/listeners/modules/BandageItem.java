@@ -30,8 +30,8 @@ public class BandageItem {
         this.plugin = plugin;
 	}
 	
-	private HashMap<Player, PlayerDataClass> healing = new HashMap<>();
-	private ArrayList<Player> cooldown = new ArrayList<>();
+	private HashMap<Player, PlayerDataClass> healing = new HashMap<Player, PlayerDataClass>();
+	private ArrayList<Player> cooldown = new ArrayList<Player>();
 	
 	public void action(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
@@ -105,7 +105,7 @@ public class BandageItem {
 	
 	
 	
-	public void bandageHit(Player healer, Player healTarget) {
+	public void bandageHit(final Player healer, Player healTarget) {
 		if (!(cooldown.contains(healTarget))) {
 			PlayerDataClass healInfo = new PlayerDataClass(healTarget, false, false);
 			healing.put(healer, healInfo);
@@ -148,7 +148,7 @@ public class BandageItem {
 		}
 	}
 	
-	public void shearHit(Player healer, Player healTarget) {
+	public void shearHit(Player healer, final Player healTarget) {
 		if (healing.containsKey(healer)) {
 			
 			PlayerDataClass healInfo = healing.get(healer);

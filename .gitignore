@@ -7,3 +7,6 @@ dependency-reduced-pom.xml
 *.iml
 *.jar
 *.class
+.settings/
+.classpath
+.project
