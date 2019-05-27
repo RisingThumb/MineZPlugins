@@ -25,8 +25,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class PlayerListeners implements Listener {
 
 	// Modifiable variables to remove "Magic Numbers"
-	final private int bleedRange = 2;
-	final private int infectionRange = 2;
+
 	final private int maxWaterLevel = 20;
 
 
@@ -68,7 +67,6 @@ public class PlayerListeners implements Listener {
 							loneSword.action(player);
 						}
 					}
-
 				default:
 					break;
 			}
@@ -125,7 +123,7 @@ public class PlayerListeners implements Listener {
 
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
-    	bandageItem.action(event, bleedRange, infectionRange);
+    	bandageItem.action(event);
     }
 
     @EventHandler

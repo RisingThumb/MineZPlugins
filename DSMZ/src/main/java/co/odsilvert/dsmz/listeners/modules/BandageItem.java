@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -21,6 +22,11 @@ import co.odsilvert.dsmz.util.PlayerDataClass;
 
 @Singleton
 public class BandageItem {
+
+	// TODO: Add to main plugin configuration file to be editable from outside the code
+	private final int bleedRange = 2;
+	private final int infectionRange = 2;
+
 	private DSMZ plugin;
 	
 	@Inject PlayerStatusHandler playerStatusHandler;
@@ -41,7 +47,7 @@ public class BandageItem {
 		player.sendMessage(ChatColor.GREEN+"You bandaged yourself.");
 	}
 	
-	public void action(EntityDamageByEntityEvent event, int bleedRange, int infectionRange) {
+	public void action(EntityDamageByEntityEvent event) {
     	Entity victim = event.getEntity();
     	Entity damager = event.getDamager();
     	
@@ -50,29 +56,35 @@ public class BandageItem {
     	// Could be extended to legendaries, but that'd probably be best in a completely different class for modularity
     	
     	if (damager instanceof Player) {
+			ItemStack item = ((Player)damager).getEquipment().getItemInMainHand();
+
     		if (victim instanceof Player) {
-    			switch (((Player) damager).getEquipment().getItemInMainHand().getType()) {
-    				case PAPER:
-    					event.setCancelled(true);
-    					bandageHit((Player) damager, (Player) victim);
-    					return;
-    				case CACTUS_GREEN:
-    					event.setCancelled(true);
-    					ointmentHit((Player) damager, (Player) victim, 0);
-    					return;
-    				case ROSE_RED:
-    					event.setCancelled(true);
-    					ointmentHit((Player) damager, (Player) victim, 1);
-    					return;
-    				case SHEARS:
-    					event.setCancelled(true);
-    					shearHit((Player) damager, (Player) victim);
-    					return;
-    				default:
+    			switch (item.getType()) {
+					case PAPER:
+						event.setCancelled(true);
+						bandageHit((Player) damager, (Player) victim);
+						return;
+					case SHEARS:
+						event.setCancelled(true);
+						shearHit((Player) damager, (Player) victim);
+						return;
+					case INK_SACK:
+						// Yay! Magic numbers!
+						// 1 = Red dye, 10 = Lime dye
+						if (item.getData().getData() == 1) {
+							event.setCancelled(true);
+							ointmentHit((Player)damager, (Player)victim, 1);
+						} else if (item.getData().getData() == 10) {
+							event.setCancelled(true);
+							ointmentHit((Player)damager, (Player)victim, 0);
+						}
+						break;
+					default:
     					break;
-    			}
+				}
     		}
     	}
+
     	
     	
     	// All bleeding and infection code
@@ -105,7 +117,7 @@ public class BandageItem {
 	
 	
 	
-	public void bandageHit(final Player healer, Player healTarget) {
+	private void bandageHit(final Player healer, Player healTarget) {
 		if (!(cooldown.contains(healTarget))) {
 			PlayerDataClass healInfo = new PlayerDataClass(healTarget, false, false);
 			healing.put(healer, healInfo);
@@ -123,7 +135,7 @@ public class BandageItem {
 		}
 	}
 	
-	public void ointmentHit(Player healer, Player healTarget, int ointment) {
+	private void ointmentHit(Player healer, Player healTarget, int ointment) {
 		if (!(cooldown.contains(healTarget))) {
 			if (healing.containsKey(healer)) {
 				PlayerDataClass healInfo = healing.get(healer);
@@ -148,7 +160,7 @@ public class BandageItem {
 		}
 	}
 	
-	public void shearHit(Player healer, final Player healTarget) {
+	private void shearHit(Player healer, final Player healTarget) {
 		if (healing.containsKey(healer)) {
 			
 			PlayerDataClass healInfo = healing.get(healer);
