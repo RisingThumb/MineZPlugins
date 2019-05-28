@@ -1,6 +1,7 @@
 package co.odsilvert.dsmz.main;
 
 import co.odsilvert.dsmz.config.ConfigHandler;
+import co.odsilvert.dsmz.listeners.InventoryListener;
 import co.odsilvert.dsmz.listeners.PlayerListeners;
 import co.odsilvert.dsmz.timers.PlayerStatusTimer;
 import co.odsilvert.dsmz.timers.PlayerDehydrationTimer;
@@ -22,6 +23,7 @@ public class DSMZ extends JavaPlugin {
     @Inject private PlayerDehydrationTimer playerDehydrationTimer;
     @Inject private PlayerStatusTimer playerBleedingTimer;
     @Inject private ConfigHandler configHandler;
+    @Inject private InventoryListener inventoryListener;
 
     @Override
     public void onEnable() {
@@ -53,6 +55,7 @@ public class DSMZ extends JavaPlugin {
         PluginManager pluginManager = getServer().getPluginManager();
 
         pluginManager.registerEvents(this.playerListeners, this);
+        pluginManager.registerEvents(this.inventoryListener, this);
     }
 
 }
