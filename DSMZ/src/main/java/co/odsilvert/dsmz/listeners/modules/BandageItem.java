@@ -78,7 +78,7 @@ public class BandageItem {
 							event.setCancelled(true);
 							ointmentHit((Player)damager, (Player)victim, 0);
 						}
-						break;
+						return;
 					default:
     					break;
 				}
@@ -88,6 +88,7 @@ public class BandageItem {
     	
     	
     	// All bleeding and infection code
+		// TODO: Move bleeding code from PlayerInteractEvent to EntityDamageEvent to allow bleeding from sources other than players
     	
     	if (victim instanceof Player) {
     		Player playerHurt = (Player) victim;
