@@ -2,9 +2,11 @@ package co.odsilvert.dsmz.listeners;
 
 import co.odsilvert.dsmz.listeners.modules.*;
 import co.odsilvert.dsmz.listeners.modules.legendaries.LoneSword;
+import co.odsilvert.dsmz.listeners.modules.legendaries.Vampyr;
 import co.odsilvert.dsmz.main.DSMZ;
 
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -39,6 +41,7 @@ public class PlayerListeners implements Listener {
 	@Inject private PlayerStatusHandler playerStatusHandler;
 	@Inject private BandageItem bandageItem;
 	@Inject private LoneSword loneSword;
+	@Inject private Vampyr vampyr;
 	@Inject private DSMZ plugin;
 
 	@EventHandler
@@ -61,7 +64,7 @@ public class PlayerListeners implements Listener {
 					break;
 				case IRON_SWORD:
 					if (item.hasItemMeta()){
-						String itemName = player.getEquipment().getItemInMainHand().getItemMeta().getDisplayName();
+						String itemName = item.getItemMeta().getDisplayName();
 
 						if (itemName.equals("Lone Sword")) {
 							loneSword.action(player);
@@ -121,9 +124,49 @@ public class PlayerListeners implements Listener {
         playerWaterHandler.setDehydrating(player, false);
     }
 
-    @EventHandler
+    @SuppressWarnings("deprecation")
+	@EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
-    	bandageItem.action(event);
+    	Entity victim = event.getEntity();
+    	Entity damager = event.getDamager();
+    	
+    	if (damager instanceof Player) {
+    		ItemStack item = ((Player)damager).getEquipment().getItemInMainHand();
+    		if (victim instanceof Player) {
+    			switch(item.getType()) {
+    			case PAPER:
+					bandageItem.bandageHit((Player) damager, (Player) victim, event);
+					break;
+				case SHEARS:
+					bandageItem.shearHit((Player) damager, (Player) victim, event);
+					break;
+				case INK_SACK:
+					// Yay! Magic numbers!
+					// 1 = Red dye, 10 = Lime dye
+					if (item.getData().getData() == 1) {
+						bandageItem.ointmentHit((Player)damager, (Player)victim, 1, event);
+					} else if (item.getData().getData() == 10) {
+						bandageItem.ointmentHit((Player)damager, (Player)victim, 0, event);
+					}
+					break;
+				case IRON_SWORD:
+					bandageItem.bleedingInfection(victim, damager);
+					if (item.hasItemMeta()){
+						legendaryHandler(item, event);
+					}
+				default:
+					break;
+    			}
+    		}
+    	}
+    }
+    // Because nested switch statements are mind-killing
+    private void legendaryHandler(ItemStack item, EntityDamageByEntityEvent event) {
+    	String itemName = item.getItemMeta().getDisplayName();
+    	switch(itemName) {
+		case "Vampyr":
+			vampyr.action(event);
+		}
     }
 
     @EventHandler
