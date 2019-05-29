@@ -38,7 +38,6 @@ public class GrappleHook {
 			Location playerPosition = player.getEyeLocation();
 			Location distanceOf2Points = hookPosition.subtract(playerPosition);
 			// We get distance of the 2 points as location. Location is X Y and Z data like a 3D Vector
-			System.out.println("X:"+distanceOf2Points.getX()+"\nY:"+distanceOf2Points.getY()+"\nZ:"+distanceOf2Points.getZ());
 			if (distanceOf2Points.getY()<0) {
 				player.sendMessage(ChatColor.RED+"Your hook is not attached high enough");
 				return;
