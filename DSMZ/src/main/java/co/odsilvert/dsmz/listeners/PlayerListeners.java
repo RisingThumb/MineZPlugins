@@ -42,6 +42,7 @@ public class PlayerListeners implements Listener {
 	@Inject private BandageItem bandageItem;
 	@Inject private LoneSword loneSword;
 	@Inject private Vampyr vampyr;
+	@Inject private GrappleHook grappleHook;
 	@Inject private DSMZ plugin;
 
 	@EventHandler
@@ -205,6 +206,12 @@ public class PlayerListeners implements Listener {
 	@EventHandler
 	public void onTeleport(PlayerTeleportEvent event){
 		grenadeListener.teleportAction(event);
+	}
+	
+	@EventHandler
+	public void onPlayerFishingEvent(PlayerFishEvent event) {
+		grappleHook.action(event);
+		
 	}
 		
 }
