@@ -41,7 +41,7 @@ public class BandageItem {
 	public void action(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		playerStatusHandler.setBleeding(player, false);
-		player.setHealth(Math.min(1, 20 - player.getHealth()));
+		player.setHealth(player.getHealth() + Math.min(1, 20 - player.getHealth()));
 		player.getInventory().setItemInMainHand(null);
 		player.sendMessage(ChatColor.GREEN+"You bandaged yourself.");
 	}
@@ -143,7 +143,6 @@ public class BandageItem {
         		// Bleeding check
         		{
     	    		int random = (int )(Math.random() * infectionRange + 1);
-    	    		System.out.println(random);
     	    		if (random == 1) {
     	    			playerStatusHandler.setInfected(playerHurt, true);
     	    		}

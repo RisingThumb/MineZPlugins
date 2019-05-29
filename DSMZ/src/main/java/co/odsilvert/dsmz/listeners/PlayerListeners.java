@@ -135,13 +135,15 @@ public class PlayerListeners implements Listener {
     	if (damager instanceof Player) {
     		ItemStack item = ((Player)damager).getEquipment().getItemInMainHand();
     		if (victim instanceof Player) {
+    			// return if not intending to bleed/infect
+    			// break if intending to bleed/infect
     			switch(item.getType()) {
     			case PAPER:
 					bandageItem.bandageHit((Player) damager, (Player) victim, event);
-					break;
+					return;
 				case SHEARS:
 					bandageItem.shearHit((Player) damager, (Player) victim, event);
-					break;
+					return;
 				case INK_SACK:
 					// Yay! Magic numbers!
 					// 1 = Red dye, 10 = Lime dye
@@ -150,16 +152,19 @@ public class PlayerListeners implements Listener {
 					} else if (item.getData().getData() == 10) {
 						bandageItem.ointmentHit((Player)damager, (Player)victim, 0, event);
 					}
-					break;
+					return;
 				case IRON_SWORD:
-					bandageItem.bleedingInfection(victim, damager);
 					if (item.hasItemMeta()){
 						legendaryHandler(item, event);
 					}
+					break;
 				default:
 					break;
     			}
     		}
+    	}
+    	if (victim instanceof Player) {
+    		bandageItem.bleedingInfection(victim, damager);
     	}
     }
     // Because nested switch statements are mind-killing
