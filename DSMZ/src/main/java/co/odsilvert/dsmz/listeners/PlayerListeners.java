@@ -83,7 +83,6 @@ public class PlayerListeners implements Listener {
 
 		switch (item.getType()) {
 			case POTION:
-				potionsRemove.action(event);
 				PotionMeta potion = (PotionMeta)item.getItemMeta();
 
 				if (potion.getBasePotionData().getType().equals(PotionType.WATER)) {
@@ -91,6 +90,9 @@ public class PlayerListeners implements Listener {
 					playerWaterHandler.setDehydrating(player, false);
 
 					player.sendMessage(ChatColor.BLUE + "Ahh, much better");
+				} else {
+					// Only remove bottle if potion wasn't water
+					potionsRemove.action(event);
 				}
 				break;
             case MILK_BUCKET:

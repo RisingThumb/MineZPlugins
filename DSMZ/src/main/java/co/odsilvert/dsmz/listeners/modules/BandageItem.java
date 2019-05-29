@@ -41,7 +41,7 @@ public class BandageItem {
 	public void action(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		playerStatusHandler.setBleeding(player, false);
-		player.setHealth(player.getHealth()+1);
+		player.setHealth(Math.min(1, 20 - player.getHealth()));
 		player.getInventory().setItemInMainHand(null);
 		player.sendMessage(ChatColor.GREEN+"You bandaged yourself.");
 	}
