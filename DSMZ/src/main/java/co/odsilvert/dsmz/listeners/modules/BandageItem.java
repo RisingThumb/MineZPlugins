@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -42,82 +41,13 @@ public class BandageItem {
 	public void action(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		playerStatusHandler.setBleeding(player, false);
-		player.setHealth(player.getHealth()+1);
+		player.setHealth(player.getHealth() + Math.min(1, 20 - player.getHealth()));
 		player.getInventory().setItemInMainHand(null);
 		player.sendMessage(ChatColor.GREEN+"You bandaged yourself.");
 	}
 	
-	public void action(EntityDamageByEntityEvent event) {
-    	Entity victim = event.getEntity();
-    	Entity damager = event.getDamager();
-    	
-    	
-    	// All code that should be checked for items the damager is using on a player
-    	// Could be extended to legendaries, but that'd probably be best in a completely different class for modularity
-    	
-    	if (damager instanceof Player) {
-			ItemStack item = ((Player)damager).getEquipment().getItemInMainHand();
-
-    		if (victim instanceof Player) {
-    			switch (item.getType()) {
-					case PAPER:
-						event.setCancelled(true);
-						bandageHit((Player) damager, (Player) victim);
-						return;
-					case SHEARS:
-						event.setCancelled(true);
-						shearHit((Player) damager, (Player) victim);
-						return;
-					case INK_SACK:
-						// Yay! Magic numbers!
-						// 1 = Red dye, 10 = Lime dye
-						if (item.getData().getData() == 1) {
-							event.setCancelled(true);
-							ointmentHit((Player)damager, (Player)victim, 1);
-						} else if (item.getData().getData() == 10) {
-							event.setCancelled(true);
-							ointmentHit((Player)damager, (Player)victim, 0);
-						}
-						break;
-					default:
-    					break;
-				}
-    		}
-    	}
-
-    	
-    	
-    	// All bleeding and infection code
-    	
-    	if (victim instanceof Player) {
-    		Player playerHurt = (Player) victim;
-    		// Bleeding check
-    		{
-	    		int random = (int )(Math.random() * bleedRange + 1);
-	    		if (random == 1) {
-	    			playerStatusHandler.setBleeding(playerHurt, true);
-	    		}
-    		}
-    		
-    		if (damager instanceof Zombie) {
-        		// Bleeding check
-        		{
-    	    		int random = (int )(Math.random() * infectionRange + 1);
-    	    		System.out.println(random);
-    	    		if (random == 1) {
-    	    			playerStatusHandler.setInfected(playerHurt, true);
-    	    		}
-        		}
-    		}
-    		
-    		
-    	}
-	}
-	
-	
-	
-	
-	private void bandageHit(final Player healer, Player healTarget) {
+	public void bandageHit(final Player healer, Player healTarget, EntityDamageByEntityEvent event) {
+		event.setCancelled(true);
 		if (!(cooldown.contains(healTarget))) {
 			PlayerDataClass healInfo = new PlayerDataClass(healTarget, false, false);
 			healing.put(healer, healInfo);
@@ -135,7 +65,8 @@ public class BandageItem {
 		}
 	}
 	
-	private void ointmentHit(Player healer, Player healTarget, int ointment) {
+	public void ointmentHit(Player healer, Player healTarget, int ointment, EntityDamageByEntityEvent event) {
+		event.setCancelled(true);
 		if (!(cooldown.contains(healTarget))) {
 			if (healing.containsKey(healer)) {
 				PlayerDataClass healInfo = healing.get(healer);
@@ -160,7 +91,8 @@ public class BandageItem {
 		}
 	}
 	
-	private void shearHit(Player healer, final Player healTarget) {
+	public void shearHit(Player healer, final Player healTarget, EntityDamageByEntityEvent event) {
+		event.setCancelled(true);
 		if (healing.containsKey(healer)) {
 			
 			PlayerDataClass healInfo = healing.get(healer);
@@ -195,5 +127,28 @@ public class BandageItem {
 			healer.sendMessage(ChatColor.BLUE+ healTarget.getName()+" is at "+Integer.toString((int) healTarget.getHealth())+" health." );
 		}
 	}
+	
+	public void bleedingInfection(Entity victim, Entity damager) {
+		if (victim instanceof Player) {
+    		Player playerHurt = (Player) victim;
+    		// Bleeding check
+    		{
+	    		int random = (int )(Math.random() * bleedRange + 1);
+	    		if (random == 1) {
+	    			playerStatusHandler.setBleeding(playerHurt, true);
+	    		}
+    		}
+    		
+    		if (damager instanceof Zombie) {
+        		// Bleeding check
+        		{
+    	    		int random = (int )(Math.random() * infectionRange + 1);
+    	    		if (random == 1) {
+    	    			playerStatusHandler.setInfected(playerHurt, true);
+    	    		}
+        		}
+    		}
 
+    	}
+	}
 }
