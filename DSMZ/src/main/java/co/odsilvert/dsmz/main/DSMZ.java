@@ -8,6 +8,8 @@ import co.odsilvert.dsmz.timers.PlayerDehydrationTimer;
 import co.odsilvert.dsmz.timers.PlayerWaterTimer;
 import co.odsilvert.dsmz.util.BinderModule;
 
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import org.bukkit.plugin.PluginManager;
@@ -17,6 +19,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 public class DSMZ extends JavaPlugin {
 
     private Injector injector;
+    private ProtocolManager protocolManager;
 
     @Inject private PlayerListeners playerListeners;
     @Inject private PlayerWaterTimer playerWaterTimer;
@@ -36,11 +39,17 @@ public class DSMZ extends JavaPlugin {
         registerListeners();
 
         configHandler.loadConfigurations();
+
+        protocolManager = ProtocolLibrary.getProtocolManager();
     }
 
     public Injector getInjector() {
         return this.injector;
     };
+
+    public ProtocolManager getProtocolManager() {
+        return this.protocolManager;
+    }
     
     // Handle global repeating tasks
     private void startTimers() {

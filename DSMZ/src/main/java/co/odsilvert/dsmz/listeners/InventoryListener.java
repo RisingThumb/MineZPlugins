@@ -3,8 +3,12 @@ package co.odsilvert.dsmz.listeners;
 import co.odsilvert.dsmz.config.ItemDataConfig;
 import co.odsilvert.dsmz.main.DSMZ;
 import co.odsilvert.dsmz.config.modules.ItemData;
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.events.PacketContainer;
 import com.google.inject.Inject;
 import org.bukkit.GameMode;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,6 +18,7 @@ import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class InventoryListener implements Listener {
@@ -40,12 +45,32 @@ public class InventoryListener implements Listener {
 
     @EventHandler
     public void onItemPickup(EntityPickupItemEvent event) {
+        Item item = event.getItem();
+
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player)event.getEntity();
+
+            if (!player.getGameMode().equals(GameMode.CREATIVE)) {
+                event.setCancelled(true);
+                sendCollectPacket(player, item);
+                event.getItem().setItemStack(null);
+            }
+        }
+
 //        if (event.getEntity() instanceof Player) {
 //            Player player = (Player)event.getEntity();
 //
 //            if (!player.getGameMode().equals(GameMode.CREATIVE)) {
-//                event.getItem().getItemStack().setAmount(1);
-//                event.setCancelled(true);
+////                event.setCancelled(true);
+//                HashMap<Integer, ? extends ItemStack> items = player.getInventory().all(item.getType());
+//                int stackSize = item.getAmount();
+//                StringBuilder result = new StringBuilder();
+//
+//                for (ItemStack itemStack : items.values()) {
+//                    result.append(itemStack.getAmount()).append(" ");
+//                }
+//
+//                log(result.toString() + '\n');
 //            }
 //        } else {
 //            event.setCancelled(true);
@@ -54,12 +79,15 @@ public class InventoryListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        log(event.getClick().toString());
-        log(event.getAction().toString());
+//        log(event.getClick().toString());
+//        log(event.getAction().toString());
         Inventory inventory = event.getClickedInventory();
 
         if (event.getClick().equals(ClickType.DOUBLE_CLICK)) {
             event.setCancelled(true);
+
+            // Nothing else needs to happen if the item can't be stacked
+//            if (itemConfig.getItemData(event.getCursor().getType()).getMaxStackSize() == 1) return;
 
             if (event.getCursor().getAmount() < 15) {
                 HashMap<Integer, ? extends ItemStack> itemStacks = inventory.all(event.getCursor().getType());
@@ -115,27 +143,27 @@ public class InventoryListener implements Listener {
 
     @EventHandler
     public void onRecipePrepare(PrepareItemCraftEvent event) {
-        log("Duh.");
+        if (event.getInventory().getHolder() instanceof Player) {
+            Player player = (Player)event.getInventory().getHolder();
 
-        Player player = (Player)event.getViewers().get(0);
+            log(player.getGameMode().toString());
 
-        log(player.getGameMode().toString());
+            // Don't cancel if players are repairing items
+            if (event.isRepair()) return;
 
-        // Don't cancel if players are repairing items
-        if (event.isRepair()) return;
+            // Don't disable crafting for creative mode players
+            // This assumes the first person to open the crafting GUI (e.g. crafting table) is
+            // in creative mode.
+            if (!player.getGameMode().equals(GameMode.CREATIVE)) {
+                CraftingInventory inventory = event.getInventory();
+                ItemStack result = inventory.getResult();
 
-        // Don't disable crafting for creative mode players
-        // This assumes the first person to open the crafting GUI (e.g. crafting table) is
-        // in creative mode.
-        if (!player.getGameMode().equals(GameMode.CREATIVE)) {
-            CraftingInventory inventory = event.getInventory();
-            ItemStack result = inventory.getResult();
+                if (!(result == null)) {
+                    ItemData itemData = itemConfig.getItemData(result.getType());
 
-            if (!(result == null)) {
-                ItemData itemData = itemConfig.getItemData(result.getType());
-
-                if (!itemData.isCraftable()) {
-                    inventory.setResult(null);
+                    if (!itemData.isCraftable()) {
+                        inventory.setResult(null);
+                    }
                 }
             }
         }
@@ -144,5 +172,27 @@ public class InventoryListener implements Listener {
     @EventHandler
     public void onCraft(CraftItemEvent event) {
         // Cancel if not craftable (Purely as a failsafe)
+    }
+
+    // Send packet to display the item pickup animation, despite the item being deleted
+    private void sendCollectPacket(Player player, Item item) {
+        PacketContainer itemPickupAnimation = plugin.getProtocolManager().createPacket(PacketType.Play.Server.COLLECT);
+
+        itemPickupAnimation.getIntegers()
+                .write(0, item.getEntityId())
+                .write(1, player.getEntityId())
+                .write(2, item.getItemStack().getAmount());
+
+        try {
+            plugin.getProtocolManager().sendServerPacket(player, itemPickupAnimation);
+
+            for (Entity entity : player.getNearbyEntities(30, 30, 30)) {
+                if (entity instanceof Player) {
+                    plugin.getProtocolManager().sendServerPacket((Player)entity, itemPickupAnimation);
+                }
+            }
+        } catch (InvocationTargetException ex) {
+            throw new RuntimeException("Error: Failed to send packet " + itemPickupAnimation, ex);
+        }
     }
 }

@@ -3,4 +3,5 @@ version: ${project.version}
 main: co.odsilvert.dsmz.main.DSMZ
 authors: [Silver, ODST]
 description: A test plugin for merging all existing features
-api-version: 1.13
+api-version: 1.12
+depend: [ProtocolLib]
