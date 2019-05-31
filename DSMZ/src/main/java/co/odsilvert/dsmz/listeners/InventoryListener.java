@@ -45,36 +45,58 @@ public class InventoryListener implements Listener {
 
     @EventHandler
     public void onItemPickup(EntityPickupItemEvent event) {
-        Item item = event.getItem();
 
         if (event.getEntity() instanceof Player) {
             Player player = (Player)event.getEntity();
+            Item item = event.getItem();
 
             if (!player.getGameMode().equals(GameMode.CREATIVE)) {
                 event.setCancelled(true);
-                sendCollectPacket(player, item);
-                event.getItem().setItemStack(null);
-            }
-        }
 
-//        if (event.getEntity() instanceof Player) {
-//            Player player = (Player)event.getEntity();
-//
-//            if (!player.getGameMode().equals(GameMode.CREATIVE)) {
-////                event.setCancelled(true);
-//                HashMap<Integer, ? extends ItemStack> items = player.getInventory().all(item.getType());
-//                int stackSize = item.getAmount();
-//                StringBuilder result = new StringBuilder();
-//
-//                for (ItemStack itemStack : items.values()) {
-//                    result.append(itemStack.getAmount()).append(" ");
-//                }
-//
-//                log(result.toString() + '\n');
-//            }
-//        } else {
-//            event.setCancelled(true);
-//        }
+                HashMap<Integer, ? extends ItemStack> items = player.getInventory().all(item.getItemStack().getType());
+                int stackSize = item.getItemStack().getAmount();
+
+                for (ItemStack itemStack : items.values()) {
+                    // TODO: Update to skip if maxStackSize is 1
+                    if (itemStack.getAmount() < 15 && item.getItemStack().getItemMeta().equals(itemStack.getItemMeta())) {
+                        int difference = Math.min(15 - itemStack.getAmount(), stackSize);
+
+                        itemStack.setAmount(itemStack.getAmount() + difference);
+                        stackSize -= difference;
+
+                        if (stackSize == 0) {
+                            sendCollectPacket(player, item);
+                            break;
+                        }
+                    }
+                }
+
+                while (stackSize > 0) {
+                    int slot = player.getInventory().firstEmpty();
+                    int amount = Math.min(15, stackSize);
+
+                    if (slot > -1) {
+                        player.getInventory().setItem(slot, new ItemStack(item.getItemStack().getType(), amount));
+                        stackSize -= amount;
+
+                        if (item.getItemStack().hasItemMeta()) {
+                            player.getInventory().getItem(slot).setItemMeta(item.getItemStack().getItemMeta());
+                        }
+
+                        if (stackSize == 0) {
+                            sendCollectPacket(player, item);
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                item.getItemStack().setAmount(stackSize);
+            }
+        } else {
+            // Disable picking up items for entities other than players
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler
