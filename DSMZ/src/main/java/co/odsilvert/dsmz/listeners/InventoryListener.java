@@ -7,6 +7,7 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
 import com.google.inject.Inject;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -105,51 +106,69 @@ public class InventoryListener implements Listener {
 //        log(event.getAction().toString());
         Inventory inventory = event.getClickedInventory();
 
-        if (event.getClick().equals(ClickType.DOUBLE_CLICK)) {
+        if (event.getAction().equals(InventoryAction.COLLECT_TO_CURSOR)) {
             event.setCancelled(true);
+            handleDoubleClick(event.getCursor(), inventory);
+        } else if (event.getAction().equals(InventoryAction.PLACE_ALL)
+                || event.getAction().equals(InventoryAction.PLACE_SOME)) {
+            ItemStack current = event.getCurrentItem();
+            ItemStack cursor = event.getCursor();
+            int amount = Math.min(current.getMaxStackSize() - current.getAmount(), cursor.getAmount());
 
-            // Nothing else needs to happen if the item can't be stacked
-//            if (itemConfig.getItemData(event.getCursor().getType()).getMaxStackSize() == 1) return;
+            if (!event.getCurrentItem().getType().equals(Material.AIR)) {
+                event.setCancelled(true);
+                int difference = 15 - current.getAmount();
 
-            if (event.getCursor().getAmount() < 15) {
-                HashMap<Integer, ? extends ItemStack> itemStacks = inventory.all(event.getCursor().getType());
-                List<ItemStack> sortedItems = new ArrayList<>(itemStacks.values());
-
-                sortedItems.sort((o1, o2) -> {
-                    if (o1.getAmount() == o2.getAmount()) return 0;
-                    return (o1.getAmount() < o2.getAmount()) ? -1 : 1;
-                });
-
-                int stackSize = event.getCursor().getAmount();
-
-                for (ItemStack item : sortedItems) {
-                    if (item == event.getCursor()) continue;
-
-                    if (item.getItemMeta().equals(event.getCursor().getItemMeta())) {
-                        if (item.getAmount() + stackSize <= 15) {
-                            stackSize += item.getAmount();
-                            item.setAmount(0);
-                        } else {
-                            item.setAmount(item.getAmount() - (15 - stackSize));
-                            stackSize = 15;
-                            break;
-                        }
-                    }
+                if (difference > 0) {
+                    current.setAmount(current.getAmount() + Math.min(difference, amount));
+                    cursor.setAmount(cursor.getAmount() - Math.min(difference, amount));
                 }
-
-                event.getCursor().setAmount(stackSize);
             }
-
-            if (event.getWhoClicked() instanceof Player) {
-                ((Player)event.getWhoClicked()).updateInventory();
+        } else if (event.getAction().equals(InventoryAction.PLACE_ONE)) {
+            if (!event.getCurrentItem().getType().equals(Material.AIR)) {
+                if (event.getCurrentItem().getAmount() >= 15) {
+                    event.setCancelled(true);
+                }
             }
+        } else if (event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
+            log(event.getAction().toString());
+            log(event.getClickedInventory().getType().toString());
         }
 
-//        if (inventory.getType().equals(InventoryType.CRAFTING) ||
-//                inventory.getType().equals(InventoryType.WORKBENCH)) {
-//            CraftingInventory craftingInventory = (CraftingInventory) inventory;
-//            ItemStack result = craftingInventory.getResult();
+//        if (event.getWhoClicked() instanceof Player) {
+//            ((Player)event.getWhoClicked()).updateInventory();
 //        }
+    }
+
+    private void handleDoubleClick(ItemStack cursorItem, Inventory inventory) {
+        if (cursorItem.getAmount() < 15) {
+            HashMap<Integer, ? extends ItemStack> itemStacks = inventory.all(cursorItem.getType());
+            List<ItemStack> sortedItems = new ArrayList<>(itemStacks.values());
+
+            sortedItems.sort((o1, o2) -> {
+                if (o1.getAmount() == o2.getAmount()) return 0;
+                return (o1.getAmount() < o2.getAmount()) ? -1 : 1;
+            });
+
+            int stackSize = cursorItem.getAmount();
+
+            for (ItemStack item : sortedItems) {
+                if (item == cursorItem) continue;
+
+                if (item.getItemMeta().equals(cursorItem.getItemMeta())) {
+                    if (item.getAmount() + stackSize <= 15) {
+                        stackSize += item.getAmount();
+                        item.setAmount(0);
+                    } else {
+                        item.setAmount(item.getAmount() - (15 - stackSize));
+                        stackSize = 15;
+                        break;
+                    }
+                }
+            }
+
+            cursorItem.setAmount(stackSize);
+        }
     }
 
     @EventHandler
