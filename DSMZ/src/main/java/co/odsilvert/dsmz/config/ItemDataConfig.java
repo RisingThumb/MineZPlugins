@@ -59,6 +59,10 @@ public class ItemDataConfig {
     }
 
     public ItemData getItemData(Material material) {
-        return itemData.get(material);
+        if (itemData.containsKey(material)) {
+            return itemData.get(material);
+        } else {
+            return new ItemData(material, material.toString(), 1, false);
+        }
     }
 }

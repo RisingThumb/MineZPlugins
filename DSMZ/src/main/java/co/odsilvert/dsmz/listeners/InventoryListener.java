@@ -17,6 +17,7 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.InvocationTargetException;
@@ -35,15 +36,6 @@ public class InventoryListener implements Listener {
         plugin.getLogger().info(message);
     }
 
-//    @EventHandler
-//    public void onItemHold(PlayerItemHeldEvent event) {
-//        ItemStack item = event.getPlayer().getInventory().getItem(event.getNewSlot());
-//        ItemData itemData = itemConfig.getItemData(item.getType());
-//
-//        log("Player is holding item: " + itemData.getName() + ", " + itemData.getMaxStackSize() + ", " + itemData.isCraftable());
-
-//    }
-
     @EventHandler
     public void onItemPickup(EntityPickupItemEvent event) {
 
@@ -53,46 +45,13 @@ public class InventoryListener implements Listener {
 
             if (!player.getGameMode().equals(GameMode.CREATIVE)) {
                 event.setCancelled(true);
+                int amount = addItemStack(item.getItemStack(), player.getInventory());
 
-                HashMap<Integer, ? extends ItemStack> items = player.getInventory().all(item.getItemStack().getType());
-                int stackSize = item.getItemStack().getAmount();
-
-                for (ItemStack itemStack : items.values()) {
-                    // TODO: Update to skip if maxStackSize is 1
-                    if (itemStack.getAmount() < 15 && item.getItemStack().getItemMeta().equals(itemStack.getItemMeta())) {
-                        int difference = Math.min(15 - itemStack.getAmount(), stackSize);
-
-                        itemStack.setAmount(itemStack.getAmount() + difference);
-                        stackSize -= difference;
-
-                        if (stackSize == 0) {
-                            sendCollectPacket(player, item);
-                            break;
-                        }
-                    }
+                if (amount == 0) {
+                    sendCollectPacket(player, item);
                 }
 
-                while (stackSize > 0) {
-                    int slot = player.getInventory().firstEmpty();
-                    int amount = Math.min(15, stackSize);
-
-                    if (slot > -1) {
-                        player.getInventory().setItem(slot, new ItemStack(item.getItemStack().getType(), amount));
-                        stackSize -= amount;
-
-                        if (item.getItemStack().hasItemMeta()) {
-                            player.getInventory().getItem(slot).setItemMeta(item.getItemStack().getItemMeta());
-                        }
-
-                        if (stackSize == 0) {
-                            sendCollectPacket(player, item);
-                            break;
-                        }
-                    } else {
-                        break;
-                    }
-                }
-                item.getItemStack().setAmount(stackSize);
+                item.getItemStack().setAmount(amount);
             }
         } else {
             // Disable picking up items for entities other than players
@@ -104,40 +63,204 @@ public class InventoryListener implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
 //        log(event.getClick().toString());
 //        log(event.getAction().toString());
+        log("Slot: " + event.getSlot() + ", Raw: " + event.getRawSlot() + ", Type: " + event.getSlotType().toString());
         Inventory inventory = event.getClickedInventory();
 
-        if (event.getAction().equals(InventoryAction.COLLECT_TO_CURSOR)) {
-            event.setCancelled(true);
-            handleDoubleClick(event.getCursor(), inventory);
-        } else if (event.getAction().equals(InventoryAction.PLACE_ALL)
-                || event.getAction().equals(InventoryAction.PLACE_SOME)) {
-            ItemStack current = event.getCurrentItem();
-            ItemStack cursor = event.getCursor();
-            int amount = Math.min(current.getMaxStackSize() - current.getAmount(), cursor.getAmount());
+        log("Inventory raw size: " + inventory.getSize());
+        if (event.getWhoClicked() instanceof Player) {
+            Player player = (Player)event.getWhoClicked();
 
-            if (!event.getCurrentItem().getType().equals(Material.AIR)) {
-                event.setCancelled(true);
-                int difference = 15 - current.getAmount();
-
-                if (difference > 0) {
-                    current.setAmount(current.getAmount() + Math.min(difference, amount));
-                    cursor.setAmount(cursor.getAmount() - Math.min(difference, amount));
-                }
-            }
-        } else if (event.getAction().equals(InventoryAction.PLACE_ONE)) {
-            if (!event.getCurrentItem().getType().equals(Material.AIR)) {
-                if (event.getCurrentItem().getAmount() >= 15) {
+            if (!player.getGameMode().equals(GameMode.CREATIVE)) {
+                if (event.getAction().equals(InventoryAction.COLLECT_TO_CURSOR)) {
                     event.setCancelled(true);
+                    handleDoubleClick(event.getCursor(), inventory);
+                } else if (event.getAction().equals(InventoryAction.PLACE_ALL)
+                        || event.getAction().equals(InventoryAction.PLACE_SOME)) {
+                    ItemStack current = event.getCurrentItem();
+                    ItemStack cursor = event.getCursor();
+                    int amount = Math.min(current.getMaxStackSize() - current.getAmount(), cursor.getAmount());
+
+                    if (!event.getCurrentItem().getType().equals(Material.AIR)) {
+                        event.setCancelled(true);
+                        int difference = 15 - current.getAmount();
+
+                        if (difference > 0) {
+                            current.setAmount(current.getAmount() + Math.min(difference, amount));
+                            cursor.setAmount(cursor.getAmount() - Math.min(difference, amount));
+                        }
+                    }
+                } else if (event.getAction().equals(InventoryAction.PLACE_ONE)) {
+                    if (!event.getCurrentItem().getType().equals(Material.AIR)) {
+                        if (event.getCurrentItem().getAmount() >= 15) {
+                            event.setCancelled(true);
+                        }
+                    }
+                } else if (event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
+                    event.setCancelled(true);
+                    handleShiftClick(event);
                 }
             }
-        } else if (event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
-            log(event.getAction().toString());
-            log(event.getClickedInventory().getType().toString());
+        }
+    }
+
+    private void handleShiftClick(InventoryClickEvent event) {
+        ItemStack itemStack = event.getCurrentItem();
+        InventoryView inventoryView = event.getView();
+        Inventory inventory = event.getClickedInventory();
+        int startIndex;
+        int endIndex;
+        Inventory targetInventory;
+
+        if (inventoryView.getTopInventory().getType().equals(InventoryType.CRAFTING)) {
+            targetInventory = inventoryView.getBottomInventory();
+
+            if (inventory == inventoryView.getBottomInventory()) {
+                if (event.getSlotType().equals(InventoryType.SlotType.QUICKBAR)) {
+                    startIndex = 9;
+                    endIndex = 36;
+                } else {
+                    startIndex = 36;
+                    endIndex = 45;
+                }
+            } else {
+                if (event.getSlotType().equals(InventoryType.SlotType.RESULT)) {
+                    endIndex = 45;
+                    startIndex = 9;
+                } else {
+                    startIndex = 9;
+                    endIndex = 45;
+                }
+            }
+        } else if (inventoryView.getTopInventory().getType().equals(InventoryType.CHEST)) {
+            if (inventory == inventoryView.getTopInventory()) {
+                targetInventory = inventoryView.getBottomInventory();
+                endIndex = inventoryView.getTopInventory().getSize();
+
+                // Even inside of a chest inventory, the player inventory adds 5 extra slots to the total count
+                // because of the armor/shield slots, despite not being visible in the InventoryView. To fix this,
+                // we subtract 5 to remove those extra slots, so InventoryView#convertSlot() does its math right.
+                startIndex = endIndex + targetInventory.getSize() - 5;
+            } else {
+                targetInventory = inventoryView.getTopInventory();
+                startIndex = 0;
+                endIndex = inventoryView.getTopInventory().getSize();
+            }
+        } else {
+            String inventoryType = inventoryView.getTopInventory().getType().toString().replace('_', ' ').toLowerCase();
+            //TODO: Implement these
+            log("Error: Shift clicking in the " + inventoryType + " GUI is currently not implemented.");
+            return;
         }
 
-//        if (event.getWhoClicked() instanceof Player) {
-//            ((Player)event.getWhoClicked()).updateInventory();
-//        }
+        int amount = addRaw(itemStack, targetInventory, inventoryView, startIndex, endIndex);
+
+        if (event.getSlotType().equals(InventoryType.SlotType.RESULT)) {
+            // TODO: Implement this, too
+            log("Shift clicking from the crafting result slot is currently not implemented");
+        } else {
+            event.getCurrentItem().setAmount(amount);
+        }
+    }
+
+    private int addRaw(ItemStack item, Inventory targetInventory, InventoryView view, int startIndex, int endIndex) {
+        int iterator = 1;
+        int stackSize = item.getAmount();
+        ArrayList<Integer> emptySlots = new ArrayList<>();
+
+        if (startIndex > endIndex) {
+            iterator = -1;
+            startIndex -= 1;
+            endIndex -= 1;
+        }
+
+        for (int i = startIndex; i != endIndex; i += iterator) {
+            ItemStack itemStack = targetInventory.getItem(view.convertSlot(i));
+
+            if (itemStack == null) {
+                emptySlots.add(i);
+            } else if (itemStack.isSimilar(item) && itemStack != item) {
+                log("Found " + itemStack.getAmount() + " " + itemStack.getType().toString() + " at [" + i + "] (" + view.convertSlot(i) + ")");
+
+                if (itemStack.getAmount() < 15 && item.getItemMeta().equals(itemStack.getItemMeta())) {
+                    int difference = Math.min(15 - itemStack.getAmount(), stackSize);
+                    log(" - Adding " + difference + " to stack");
+
+                    itemStack.setAmount(itemStack.getAmount() + difference);
+                    stackSize -= difference;
+                    log(" - Set stack size to " + stackSize);
+
+                    if (stackSize == 0) {
+                        return 0;
+                    }
+                }
+            }
+        }
+
+        for (int slot : emptySlots) {
+            log("Found empty slot at " + slot);
+            int amount = Math.min(15, stackSize);
+
+            ItemStack newItem = item.clone();
+            newItem.setAmount(amount);
+
+            targetInventory.setItem(view.convertSlot(slot), newItem);
+            log(" - Created item with amount " + newItem.getAmount() + " at [" + slot + "] (" + view.convertSlot(slot) + ")");
+            stackSize -= amount;
+            log(" - Set stack size to " + stackSize);
+            if (stackSize == 0) {
+                return 0;
+            }
+        }
+        return stackSize;
+    }
+
+    private int addItemStack(ItemStack item, Inventory inventory) {
+//        HashMap<Integer, ? extends ItemStack> items = inventory.all(item.getType());
+        ArrayList<Integer> emptySlots = new ArrayList<>();
+        ItemStack[] items = inventory.getStorageContents();
+        int stackSize = item.getAmount();
+
+        for (int slot = 0; slot < inventory.getStorageContents().length; slot++) {
+            if (items[slot] != null) {
+                ItemStack itemStack = items[slot];
+//                if (itemStack == item) continue;
+                if (itemStack.isSimilar(item) && item != itemStack) {
+                    log("Found " + itemStack.getAmount() + " " + itemStack.getType().toString() + " at [" + slot + "]");
+
+                    if (itemStack.getAmount() < 15 && item.getItemMeta().equals(itemStack.getItemMeta())) {
+                        int difference = Math.min(15 - itemStack.getAmount(), stackSize);
+                        log(" - Adding " + difference + " to stack");
+
+                        itemStack.setAmount(itemStack.getAmount() + difference);
+                        stackSize -= difference;
+                        log(" - Set stack size to " + stackSize);
+
+                        if (stackSize == 0) {
+                            return 0;
+                        }
+                    }
+                }
+            } else {
+                emptySlots.add(slot);
+            }
+        }
+
+        for (int slot : emptySlots) {
+            log("Found empty slot at " + slot);
+            int amount = Math.min(15, stackSize);
+
+            ItemStack newItem = item.clone();
+            newItem.setAmount(amount);
+
+            inventory.setItem(slot, newItem);
+            log(" - Created item with amount " + newItem.getAmount() + " at [" + slot + "]");
+            stackSize -= amount;
+            log(" - Set stack size to " + stackSize);
+            if (stackSize == 0) {
+                return 0;
+            }
+        }
+        return stackSize;
     }
 
     private void handleDoubleClick(ItemStack cursorItem, Inventory inventory) {
@@ -187,7 +310,7 @@ public class InventoryListener implements Listener {
         if (event.getInventory().getHolder() instanceof Player) {
             Player player = (Player)event.getInventory().getHolder();
 
-            log(player.getGameMode().toString());
+//            log(player.getGameMode().toString());
 
             // Don't cancel if players are repairing items
             if (event.isRepair()) return;
