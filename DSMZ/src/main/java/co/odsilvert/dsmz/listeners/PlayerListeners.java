@@ -2,9 +2,11 @@ package co.odsilvert.dsmz.listeners;
 
 import co.odsilvert.dsmz.listeners.modules.*;
 import co.odsilvert.dsmz.listeners.modules.legendaries.LoneSword;
+import co.odsilvert.dsmz.listeners.modules.legendaries.Vampyr;
 import co.odsilvert.dsmz.main.DSMZ;
 
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -39,6 +41,8 @@ public class PlayerListeners implements Listener {
 	@Inject private PlayerStatusHandler playerStatusHandler;
 	@Inject private BandageItem bandageItem;
 	@Inject private LoneSword loneSword;
+	@Inject private Vampyr vampyr;
+	@Inject private GrappleHook grappleHook;
 	@Inject private DSMZ plugin;
 
 	@EventHandler
@@ -61,7 +65,7 @@ public class PlayerListeners implements Listener {
 					break;
 				case IRON_SWORD:
 					if (item.hasItemMeta()){
-						String itemName = player.getEquipment().getItemInMainHand().getItemMeta().getDisplayName();
+						String itemName = item.getItemMeta().getDisplayName();
 
 						if (itemName.equals("Lone Sword")) {
 							loneSword.action(player);
@@ -80,7 +84,6 @@ public class PlayerListeners implements Listener {
 
 		switch (item.getType()) {
 			case POTION:
-				potionsRemove.action(event);
 				PotionMeta potion = (PotionMeta)item.getItemMeta();
 
 				if (potion.getBasePotionData().getType().equals(PotionType.WATER)) {
@@ -88,6 +91,9 @@ public class PlayerListeners implements Listener {
 					playerWaterHandler.setDehydrating(player, false);
 
 					player.sendMessage(ChatColor.BLUE + "Ahh, much better");
+				} else {
+					// Only remove bottle if potion wasn't water
+					potionsRemove.action(event);
 				}
 				break;
             case MILK_BUCKET:
@@ -121,9 +127,54 @@ public class PlayerListeners implements Listener {
         playerWaterHandler.setDehydrating(player, false);
     }
 
-    @EventHandler
+    @SuppressWarnings("deprecation")
+	@EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
-    	bandageItem.action(event);
+    	Entity victim = event.getEntity();
+    	Entity damager = event.getDamager();
+    	
+    	if (damager instanceof Player) {
+    		ItemStack item = ((Player)damager).getEquipment().getItemInMainHand();
+    		if (victim instanceof Player) {
+    			// return if not intending to bleed/infect
+    			// break if intending to bleed/infect
+    			switch(item.getType()) {
+    			case PAPER:
+					bandageItem.bandageHit((Player) damager, (Player) victim, event);
+					return;
+				case SHEARS:
+					bandageItem.shearHit((Player) damager, (Player) victim, event);
+					return;
+				case INK_SACK:
+					// Yay! Magic numbers!
+					// 1 = Red dye, 10 = Lime dye
+					if (item.getData().getData() == 1) {
+						bandageItem.ointmentHit((Player)damager, (Player)victim, 1, event);
+					} else if (item.getData().getData() == 10) {
+						bandageItem.ointmentHit((Player)damager, (Player)victim, 0, event);
+					}
+					return;
+				case IRON_SWORD:
+					if (item.hasItemMeta()){
+						legendaryHandler(item, event);
+					}
+					break;
+				default:
+					break;
+    			}
+    		}
+    	}
+    	if (victim instanceof Player) {
+    		bandageItem.bleedingInfection(victim, damager);
+    	}
+    }
+    // Because nested switch statements are mind-killing
+    private void legendaryHandler(ItemStack item, EntityDamageByEntityEvent event) {
+    	String itemName = item.getItemMeta().getDisplayName();
+    	switch(itemName) {
+		case "Vampyr":
+			vampyr.action(event);
+		}
     }
 
     @EventHandler
@@ -155,6 +206,12 @@ public class PlayerListeners implements Listener {
 	@EventHandler
 	public void onTeleport(PlayerTeleportEvent event){
 		grenadeListener.teleportAction(event);
+	}
+	
+	@EventHandler
+	public void onPlayerFishingEvent(PlayerFishEvent event) {
+		grappleHook.action(event);
+		
 	}
 		
 }

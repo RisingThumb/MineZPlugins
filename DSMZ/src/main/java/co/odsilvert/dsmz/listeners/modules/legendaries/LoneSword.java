@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -23,26 +22,7 @@ public class LoneSword {
 
 	private HashMap<UUID, Boolean> loneSwordUsed = new HashMap<>();
 
-//	public void action(PlayerInteractEvent event) {
-//		final Player player = event.getPlayer();
-//
-//		if (!loneSwordUsed.containsKey(player.getUniqueId())) {
-//			loneSwordUsed.put(player.getUniqueId(), false);
-//		}
-//		String itemName = player.getEquipment().getItemInMainHand().getItemMeta().getDisplayName();
-//		switch(itemName) {
-//		case "Lone Sword":
-//			loneSwordAction(player);
-//			break;
-//		default:
-//			break;
-//		}
-//	}
-
 	public void action(final Player player) {
-
-		// By this point, the item the player's holding is guaranteed to be a Lone Sword
-//		if (player.getEquipment().getItemInMainHand().getItemMeta().getDisplayName().equals("Lone Sword") && !loneSwordUsed.get(player.getUniqueId())) {
 
 		if (!loneSwordUsed.containsKey(player.getUniqueId()) || !loneSwordUsed.get(player.getUniqueId())) {
 			ItemStack loneSword = player.getEquipment().getItemInMainHand();
