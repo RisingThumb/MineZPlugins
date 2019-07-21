@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -42,11 +41,11 @@ public class BandageItem {
 	public void action(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		playerStatusHandler.setBleeding(player, false);
-		player.setHealth(player.getHealth()+1);
+		player.setHealth(player.getHealth() + Math.min(1, 20 - player.getHealth()));
 		player.getInventory().setItemInMainHand(null);
 		player.sendMessage(ChatColor.GREEN+"You bandaged yourself.");
 	}
-	
+
 	public void action(EntityDamageByEntityEvent event) {
     	Entity victim = event.getEntity();
     	Entity damager = event.getDamager();
@@ -85,8 +84,6 @@ public class BandageItem {
     		}
     	}
 
-    	
-    	
     	// All bleeding and infection code
 		// TODO: Move bleeding code from PlayerInteractEvent to EntityDamageEvent to allow bleeding from sources other than players
     	
@@ -136,7 +133,8 @@ public class BandageItem {
 		}
 	}
 	
-	private void ointmentHit(Player healer, Player healTarget, int ointment) {
+	public void ointmentHit(Player healer, Player healTarget, int ointment, EntityDamageByEntityEvent event) {
+		event.setCancelled(true);
 		if (!(cooldown.contains(healTarget))) {
 			if (healing.containsKey(healer)) {
 				PlayerDataClass healInfo = healing.get(healer);
@@ -161,7 +159,8 @@ public class BandageItem {
 		}
 	}
 	
-	private void shearHit(Player healer, final Player healTarget) {
+	public void shearHit(Player healer, final Player healTarget, EntityDamageByEntityEvent event) {
+		event.setCancelled(true);
 		if (healing.containsKey(healer)) {
 			
 			PlayerDataClass healInfo = healing.get(healer);
@@ -196,5 +195,28 @@ public class BandageItem {
 			healer.sendMessage(ChatColor.BLUE+ healTarget.getName()+" is at "+Integer.toString((int) healTarget.getHealth())+" health." );
 		}
 	}
+	
+	public void bleedingInfection(Entity victim, Entity damager) {
+		if (victim instanceof Player) {
+    		Player playerHurt = (Player) victim;
+    		// Bleeding check
+    		{
+	    		int random = (int )(Math.random() * bleedRange + 1);
+	    		if (random == 1) {
+	    			playerStatusHandler.setBleeding(playerHurt, true);
+	    		}
+    		}
+    		
+    		if (damager instanceof Zombie) {
+        		// Bleeding check
+        		{
+    	    		int random = (int )(Math.random() * infectionRange + 1);
+    	    		if (random == 1) {
+    	    			playerStatusHandler.setInfected(playerHurt, true);
+    	    		}
+        		}
+    		}
 
+    	}
+	}
 }

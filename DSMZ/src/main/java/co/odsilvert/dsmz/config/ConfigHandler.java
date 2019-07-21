@@ -26,7 +26,6 @@ public class ConfigHandler {
     }
 
     // Return values of mkdirs() and createNewFile() are unimportant.
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     private YamlConfiguration getConfig(String dataPath, String fileName) {
         File configFile = new File(dataPath, fileName);
         if (!configFile.exists()) {
