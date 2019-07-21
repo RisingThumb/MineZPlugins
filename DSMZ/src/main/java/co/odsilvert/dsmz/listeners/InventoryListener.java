@@ -69,6 +69,8 @@ public class InventoryListener implements Listener {
         log("Inventory raw size: " + inventory.getSize());
         if (event.getWhoClicked() instanceof Player) {
             Player player = (Player)event.getWhoClicked();
+            ItemStack current = event.getCurrentItem();
+            int maxStackSize = itemConfig.getItemData(current.getType()).getMaxStackSize();
 
             if (!player.getGameMode().equals(GameMode.CREATIVE)) {
                 if (event.getAction().equals(InventoryAction.COLLECT_TO_CURSOR)) {
@@ -76,13 +78,12 @@ public class InventoryListener implements Listener {
                     handleDoubleClick(event.getCursor(), inventory);
                 } else if (event.getAction().equals(InventoryAction.PLACE_ALL)
                         || event.getAction().equals(InventoryAction.PLACE_SOME)) {
-                    ItemStack current = event.getCurrentItem();
                     ItemStack cursor = event.getCursor();
                     int amount = Math.min(current.getMaxStackSize() - current.getAmount(), cursor.getAmount());
 
-                    if (!event.getCurrentItem().getType().equals(Material.AIR)) {
+                    if (!current.getType().equals(Material.AIR)) {
                         event.setCancelled(true);
-                        int difference = 15 - current.getAmount();
+                        int difference = maxStackSize - current.getAmount();
 
                         if (difference > 0) {
                             current.setAmount(current.getAmount() + Math.min(difference, amount));
@@ -90,12 +91,18 @@ public class InventoryListener implements Listener {
                         }
                     }
                 } else if (event.getAction().equals(InventoryAction.PLACE_ONE)) {
-                    if (!event.getCurrentItem().getType().equals(Material.AIR)) {
-                        if (event.getCurrentItem().getAmount() >= 15) {
+                    if (!current.getType().equals(Material.AIR)) {
+                        if (current.getAmount() >= maxStackSize) {
                             event.setCancelled(true);
                         }
                     }
                 } else if (event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
+
+                    // Don't cancel if item isn't stackable by default
+                    if (current.getMaxStackSize() == 1) {
+                        return;
+                    }
+
                     event.setCancelled(true);
                     handleShiftClick(event);
                 }
@@ -165,6 +172,7 @@ public class InventoryListener implements Listener {
     private int addRaw(ItemStack item, Inventory targetInventory, InventoryView view, int startIndex, int endIndex) {
         int iterator = 1;
         int stackSize = item.getAmount();
+        int maxStackSize = itemConfig.getItemData(item.getType()).getMaxStackSize();
         ArrayList<Integer> emptySlots = new ArrayList<>();
 
         if (startIndex > endIndex) {
@@ -181,8 +189,8 @@ public class InventoryListener implements Listener {
             } else if (itemStack.isSimilar(item) && itemStack != item) {
                 log("Found " + itemStack.getAmount() + " " + itemStack.getType().toString() + " at [" + i + "] (" + view.convertSlot(i) + ")");
 
-                if (itemStack.getAmount() < 15 && item.getItemMeta().equals(itemStack.getItemMeta())) {
-                    int difference = Math.min(15 - itemStack.getAmount(), stackSize);
+                if (itemStack.getAmount() < maxStackSize && item.getItemMeta().equals(itemStack.getItemMeta())) {
+                    int difference = Math.min(maxStackSize - itemStack.getAmount(), stackSize);
                     log(" - Adding " + difference + " to stack");
 
                     itemStack.setAmount(itemStack.getAmount() + difference);
@@ -198,7 +206,7 @@ public class InventoryListener implements Listener {
 
         for (int slot : emptySlots) {
             log("Found empty slot at " + slot);
-            int amount = Math.min(15, stackSize);
+            int amount = Math.min(maxStackSize, stackSize);
 
             ItemStack newItem = item.clone();
             newItem.setAmount(amount);
@@ -219,6 +227,7 @@ public class InventoryListener implements Listener {
         ArrayList<Integer> emptySlots = new ArrayList<>();
         ItemStack[] items = inventory.getStorageContents();
         int stackSize = item.getAmount();
+        int maxStackSize = itemConfig.getItemData(item.getType()).getMaxStackSize();
 
         for (int slot = 0; slot < inventory.getStorageContents().length; slot++) {
             if (items[slot] != null) {
@@ -227,8 +236,8 @@ public class InventoryListener implements Listener {
                 if (itemStack.isSimilar(item) && item != itemStack) {
                     log("Found " + itemStack.getAmount() + " " + itemStack.getType().toString() + " at [" + slot + "]");
 
-                    if (itemStack.getAmount() < 15 && item.getItemMeta().equals(itemStack.getItemMeta())) {
-                        int difference = Math.min(15 - itemStack.getAmount(), stackSize);
+                    if (itemStack.getAmount() < maxStackSize && item.getItemMeta().equals(itemStack.getItemMeta())) {
+                        int difference = Math.min(maxStackSize - itemStack.getAmount(), stackSize);
                         log(" - Adding " + difference + " to stack");
 
                         itemStack.setAmount(itemStack.getAmount() + difference);
@@ -247,7 +256,7 @@ public class InventoryListener implements Listener {
 
         for (int slot : emptySlots) {
             log("Found empty slot at " + slot);
-            int amount = Math.min(15, stackSize);
+            int amount = Math.min(maxStackSize, stackSize);
 
             ItemStack newItem = item.clone();
             newItem.setAmount(amount);
@@ -264,7 +273,9 @@ public class InventoryListener implements Listener {
     }
 
     private void handleDoubleClick(ItemStack cursorItem, Inventory inventory) {
-        if (cursorItem.getAmount() < 15) {
+        int maxStackSize = itemConfig.getItemData(cursorItem.getType()).getMaxStackSize();
+
+        if (cursorItem.getAmount() < maxStackSize) {
             HashMap<Integer, ? extends ItemStack> itemStacks = inventory.all(cursorItem.getType());
             List<ItemStack> sortedItems = new ArrayList<>(itemStacks.values());
 
@@ -279,12 +290,12 @@ public class InventoryListener implements Listener {
                 if (item == cursorItem) continue;
 
                 if (item.getItemMeta().equals(cursorItem.getItemMeta())) {
-                    if (item.getAmount() + stackSize <= 15) {
+                    if (item.getAmount() + stackSize <= maxStackSize) {
                         stackSize += item.getAmount();
                         item.setAmount(0);
                     } else {
-                        item.setAmount(item.getAmount() - (15 - stackSize));
-                        stackSize = 15;
+                        item.setAmount(item.getAmount() - (maxStackSize - stackSize));
+                        stackSize = maxStackSize;
                         break;
                     }
                 }
@@ -294,6 +305,7 @@ public class InventoryListener implements Listener {
         }
     }
 
+    //TODO: Work on this at some point
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event) {
         Player player = (Player)event.getWhoClicked();
