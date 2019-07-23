@@ -1,7 +1,7 @@
 package co.odsilvert.dsmz.config;
 
 import co.odsilvert.dsmz.main.DSMZ;
-import co.odsilvert.dsmz.util.ItemData;
+import co.odsilvert.dsmz.config.modules.ItemData;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.HashMap;
@@ -36,16 +36,18 @@ public class ItemDataConfig {
 
             String name = dataObjects.get("name").toString();
             int maxStackSize;
+            boolean craftable = false;
 
             try {
                 maxStackSize = (Integer)dataObjects.get("stack");
+                craftable = (Boolean)dataObjects.get("craftable");
             } catch (ClassCastException e) {
                 plugin.getLogger().info("Warning: Item stack size for item with material '" + material.toString()
                         + "' is invalid or not specified. Using default value (1).");
                 maxStackSize = 1;
             }
 
-            ItemData item = new ItemData(material, name, maxStackSize);
+            ItemData item = new ItemData(material, name, maxStackSize, craftable);
 
             /*
                 DEBUG THINGY
@@ -57,6 +59,10 @@ public class ItemDataConfig {
     }
 
     public ItemData getItemData(Material material) {
-        return itemData.get(material);
+        if (itemData.containsKey(material)) {
+            return itemData.get(material);
+        } else {
+            return new ItemData(material, material.toString(), 1, false);
+        }
     }
 }

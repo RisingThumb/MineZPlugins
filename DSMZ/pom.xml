@@ -6,7 +6,7 @@
 
     <groupId>co.odsilvert</groupId>
     <artifactId>DSMZ</artifactId>
-    <version>1.12.2-0.0.1</version>
+    <version>1.12.2-0.0.2</version>
     <name>DrillServerMineZPlugin</name>
 
     <build>
@@ -68,6 +68,10 @@
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
+        <repository>
+            <id>dmulloy2-repo</id>
+            <url>http://repo.dmulloy2.net/nexus/repository/public/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -89,6 +93,12 @@
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
             <version>4.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.comphenix.protocol</groupId>
+            <artifactId>ProtocolLib</artifactId>
+            <version>4.4.0</version>
         </dependency>
     </dependencies>
 
