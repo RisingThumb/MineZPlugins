@@ -1,7 +1,7 @@
 package co.odsilvert.dsmz.config;
 
 import co.odsilvert.dsmz.main.DSMZ;
-import co.odsilvert.dsmz.util.ItemData;
+import co.odsilvert.dsmz.config.modules.ItemData;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.util.HashMap;
@@ -35,28 +35,24 @@ public class ItemDataConfig {
             }
 
             String name = dataObjects.get("name").toString();
-            boolean craftable = false;
-
-            if (dataObjects.get("craftable").toString().toLowerCase().equals("true")) {
-                craftable = true;
-            }
-
             int maxStackSize;
+            boolean craftable = false;
 
             try {
                 maxStackSize = (Integer)dataObjects.get("stack");
+                craftable = (Boolean)dataObjects.get("craftable");
             } catch (ClassCastException e) {
                 plugin.getLogger().info("Warning: Item stack size for item with material '" + material.toString()
                         + "' is invalid or not specified. Using default value (1).");
                 maxStackSize = 1;
             }
 
-            ItemData item = new ItemData(material, name, craftable, maxStackSize);
+            ItemData item = new ItemData(material, name, maxStackSize, craftable);
 
             /*
                 DEBUG THINGY
              */
-//            System.out.printf("Successfully created an item with data: %s, %s, %d", material.name(), name, maxStackSize);
+            System.out.printf("Successfully created an item with data: %s, %s, %d", material.name(), name, maxStackSize);
             this.itemData.put(material, item);
         }
 
@@ -66,7 +62,7 @@ public class ItemDataConfig {
         if (itemData.containsKey(material)) {
             return itemData.get(material);
         } else {
-            return new ItemData(material, material.toString(), false, 1);
+            return new ItemData(material, material.toString(), 1, false);
         }
     }
 }

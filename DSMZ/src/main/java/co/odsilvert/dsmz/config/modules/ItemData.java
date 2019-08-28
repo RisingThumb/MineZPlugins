@@ -1,4 +1,4 @@
-package co.odsilvert.dsmz.util;
+package co.odsilvert.dsmz.config.modules;
 
 import org.bukkit.Material;
 
@@ -8,14 +8,14 @@ import org.bukkit.Material;
 public class ItemData {
     private Material material;
     private String customName;
-    private boolean craftable;
     private int maxStackSize;
+    private boolean craftable;
 
-    public ItemData(Material material, String customName, boolean craftable, int maxStackSize) {
+    public ItemData(Material material, String customName, int maxStackSize, boolean craftable) {
         this.material = material;
         this.customName = customName;
-        this.craftable = craftable;
         this.maxStackSize = maxStackSize;
+        this.craftable = craftable;
     }
 
     public Material getMaterial() {
@@ -26,11 +26,11 @@ public class ItemData {
         return this.customName;
     }
 
-    public boolean isCraftable() {
-        return this.craftable;
-    }
-
     public int getMaxStackSize() {
         return this.maxStackSize;
+    }
+
+    public boolean isCraftable() {
+        return craftable;
     }
 }

@@ -4,6 +4,7 @@ import co.odsilvert.dsmz.listeners.modules.PlayerWaterHandler;
 import co.odsilvert.dsmz.main.DSMZ;
 import com.google.inject.Inject;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
 public class PlayerWaterTimer implements Runnable {
@@ -18,22 +19,25 @@ public class PlayerWaterTimer implements Runnable {
     @Override
 	public void run() {
 		for (Player player : plugin.getServer().getOnlinePlayers()) {
-			int xp = player.getLevel();
+			// Disable thirst for creative mode
+			if (!player.getGameMode().equals(GameMode.CREATIVE)) {
+				int xp = player.getLevel();
 
-			if (xp > 0) {
-				playerWaterHandler.setWaterLevel(player, xp - 1);
-			}
+				if (xp > 0) {
+					playerWaterHandler.setWaterLevel(player, xp - 1);
+				}
 
-			switch (xp) {
-			case 0:
-				playerWaterHandler.setDehydrating(player, true);
-				break;
-			case 5:
-				player.sendMessage(ChatColor.RED + "You're very thirsty");
-				break;
-			case 10:
-				player.sendMessage(ChatColor.YELLOW + "You're thirsty");
-				break;
+				switch (xp) {
+					case 0:
+						playerWaterHandler.setDehydrating(player, true);
+						break;
+					case 5:
+						player.sendMessage(ChatColor.RED + "You're very thirsty");
+						break;
+					case 10:
+						player.sendMessage(ChatColor.YELLOW + "You're thirsty");
+						break;
+				}
 			}
 
 		}

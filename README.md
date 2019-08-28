@@ -14,12 +14,12 @@ To contribute, add source code to the relevant source folders. Documenting the c
 - [x] Sugar granting speed
 - [ ] Ban secondary hand OR enable a /mz shield option
 - [x] Enable a passive water/thirst mechanics
-- [ ] Create an easily extended Legendary system based on item names
+- [x] Create an easily extended Legendary system based on item names
 - [ ] Ban crafting(sort of)
 - [ ] Introduce some form of kit mechanic with default MineZ kits
-- [ ] Grappling hook that is accurate to MineZ(No horizontal grappling)
+- [x] Grappling hook that is accurate to MineZ(No horizontal grappling)
 - [x] Bandages/bleeding
-- [ ] Antidote/infection
+- [x] Antidote/infection
 - [ ] Zombie/Pigman spawning correctly
 - [x] Healing friends with bandages
 - [x] Kill messages

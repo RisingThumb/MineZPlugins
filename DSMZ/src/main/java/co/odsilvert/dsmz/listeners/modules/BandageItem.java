@@ -21,6 +21,11 @@ import co.odsilvert.dsmz.util.PlayerDataClass;
 
 @Singleton
 public class BandageItem {
+
+	// TODO: Add to main plugin configuration file to be editable from outside the code
+	private final int bleedRange = 2;
+	private final int infectionRange = 2;
+
 	private DSMZ plugin;
 	
 	@Inject PlayerStatusHandler playerStatusHandler;
@@ -36,12 +41,12 @@ public class BandageItem {
 	public void action(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		playerStatusHandler.setBleeding(player, false);
-		player.setHealth(player.getHealth()+1);
+		player.setHealth(player.getHealth() + Math.min(1, 20 - player.getHealth()));
 		player.getInventory().setItemInMainHand(null);
 		player.sendMessage(ChatColor.GREEN+"You bandaged yourself.");
 	}
-	
-	public void action(EntityDamageByEntityEvent event, int bleedRange, int infectionRange) {
+
+	public void action(EntityDamageByEntityEvent event) {
     	Entity victim = event.getEntity();
     	Entity damager = event.getDamager();
     	
@@ -50,32 +55,37 @@ public class BandageItem {
     	// Could be extended to legendaries, but that'd probably be best in a completely different class for modularity
     	
     	if (damager instanceof Player) {
+			ItemStack item = ((Player)damager).getEquipment().getItemInMainHand();
+
     		if (victim instanceof Player) {
-    			switch (((Player) damager).getEquipment().getItemInMainHand().getType()) {
-    				case PAPER:
-    					event.setCancelled(true);
-    					bandageHit((Player) damager, (Player) victim);
-    					return;
-    				case CACTUS_GREEN:
-    					event.setCancelled(true);
-    					ointmentHit((Player) damager, (Player) victim, 0);
-    					return;
-    				case ROSE_RED:
-    					event.setCancelled(true);
-    					ointmentHit((Player) damager, (Player) victim, 1);
-    					return;
-    				case SHEARS:
-    					event.setCancelled(true);
-    					shearHit((Player) damager, (Player) victim);
-    					return;
-    				default:
+    			switch (item.getType()) {
+					case PAPER:
+						event.setCancelled(true);
+						bandageHit((Player) damager, (Player) victim);
+						return;
+					case SHEARS:
+						event.setCancelled(true);
+						shearHit((Player) damager, (Player) victim);
+						return;
+					case INK_SACK:
+						// Yay! Magic numbers!
+						// 1 = Red dye, 10 = Lime dye
+						if (item.getData().getData() == 1) {
+							event.setCancelled(true);
+							ointmentHit((Player)damager, (Player)victim, 1);
+						} else if (item.getData().getData() == 10) {
+							event.setCancelled(true);
+							ointmentHit((Player)damager, (Player)victim, 0);
+						}
+						return;
+					default:
     					break;
-    			}
+				}
     		}
     	}
-    	
-    	
+
     	// All bleeding and infection code
+		// TODO: Move bleeding code from PlayerInteractEvent to EntityDamageEvent to allow bleeding from sources other than players
     	
     	if (victim instanceof Player) {
     		Player playerHurt = (Player) victim;
@@ -105,7 +115,7 @@ public class BandageItem {
 	
 	
 	
-	public void bandageHit(final Player healer, Player healTarget) {
+	private void bandageHit(final Player healer, Player healTarget) {
 		if (!(cooldown.contains(healTarget))) {
 			PlayerDataClass healInfo = new PlayerDataClass(healTarget, false, false);
 			healing.put(healer, healInfo);
@@ -123,7 +133,8 @@ public class BandageItem {
 		}
 	}
 	
-	public void ointmentHit(Player healer, Player healTarget, int ointment) {
+	public void ointmentHit(Player healer, Player healTarget, int ointment, EntityDamageByEntityEvent event) {
+		event.setCancelled(true);
 		if (!(cooldown.contains(healTarget))) {
 			if (healing.containsKey(healer)) {
 				PlayerDataClass healInfo = healing.get(healer);
@@ -148,7 +159,8 @@ public class BandageItem {
 		}
 	}
 	
-	public void shearHit(Player healer, final Player healTarget) {
+	public void shearHit(Player healer, final Player healTarget, EntityDamageByEntityEvent event) {
+		event.setCancelled(true);
 		if (healing.containsKey(healer)) {
 			
 			PlayerDataClass healInfo = healing.get(healer);
@@ -183,5 +195,28 @@ public class BandageItem {
 			healer.sendMessage(ChatColor.BLUE+ healTarget.getName()+" is at "+Integer.toString((int) healTarget.getHealth())+" health." );
 		}
 	}
+	
+	public void bleedingInfection(Entity victim, Entity damager) {
+		if (victim instanceof Player) {
+    		Player playerHurt = (Player) victim;
+    		// Bleeding check
+    		{
+	    		int random = (int )(Math.random() * bleedRange + 1);
+	    		if (random == 1) {
+	    			playerStatusHandler.setBleeding(playerHurt, true);
+	    		}
+    		}
+    		
+    		if (damager instanceof Zombie) {
+        		// Bleeding check
+        		{
+    	    		int random = (int )(Math.random() * infectionRange + 1);
+    	    		if (random == 1) {
+    	    			playerStatusHandler.setInfected(playerHurt, true);
+    	    		}
+        		}
+    		}
 
+    	}
+	}
 }
