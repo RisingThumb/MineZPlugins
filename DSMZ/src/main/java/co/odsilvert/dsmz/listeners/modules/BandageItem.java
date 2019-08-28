@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -56,29 +57,25 @@ public class BandageItem {
     	
     	if (damager instanceof Player) {
 			ItemStack item = ((Player)damager).getEquipment().getItemInMainHand();
+			event.setCancelled(true);
 
-    		if (victim instanceof Player) {
-    			switch (item.getType()) {
+			if (victim instanceof Player) {
+				switch (item.getType()) {
 					case PAPER:
-						event.setCancelled(true);
 						bandageHit((Player) damager, (Player) victim);
 						return;
 					case SHEARS:
-						event.setCancelled(true);
 						shearHit((Player) damager, (Player) victim);
 						return;
 					case INK_SACK:
 						// Yay! Magic numbers!
 						// 1 = Red dye, 10 = Lime dye
-						if (item.getData().getData() == 1) {
-							event.setCancelled(true);
-							ointmentHit((Player)damager, (Player)victim, 1);
-						} else if (item.getData().getData() == 10) {
-							event.setCancelled(true);
-							ointmentHit((Player)damager, (Player)victim, 0);
+						if (item.getData().getData() == 1 || item.getData().getData() == 10) {
+							ointmentHit((Player)damager, (Player)victim, item.getData().getData());
 						}
 						return;
 					default:
+						event.setCancelled(false);
     					break;
 				}
     		}
@@ -133,8 +130,7 @@ public class BandageItem {
 		}
 	}
 	
-	public void ointmentHit(Player healer, Player healTarget, int ointment, EntityDamageByEntityEvent event) {
-		event.setCancelled(true);
+	public void ointmentHit(Player healer, Player healTarget, int ointment) {
 		if (!(cooldown.contains(healTarget))) {
 			if (healing.containsKey(healer)) {
 				PlayerDataClass healInfo = healing.get(healer);
@@ -159,8 +155,7 @@ public class BandageItem {
 		}
 	}
 	
-	public void shearHit(Player healer, final Player healTarget, EntityDamageByEntityEvent event) {
-		event.setCancelled(true);
+	public void shearHit(Player healer, final Player healTarget) {
 		if (healing.containsKey(healer)) {
 			
 			PlayerDataClass healInfo = healing.get(healer);
