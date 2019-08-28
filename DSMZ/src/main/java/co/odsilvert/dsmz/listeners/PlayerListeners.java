@@ -136,26 +136,26 @@ public class PlayerListeners implements Listener {
     	if (damager instanceof Player) {
     		ItemStack item = ((Player)damager).getEquipment().getItemInMainHand();
     		if (victim instanceof Player) {
+    			event.setCancelled(true);
+
     			// return if not intending to bleed/infect
     			// break if intending to bleed/infect
     			switch(item.getType()) {
     			case PAPER:
-					bandageItem.bandageHit((Player) damager, (Player) victim, event);
+					bandageItem.bandageHit((Player) damager, (Player) victim);
 					return;
 				case SHEARS:
-					bandageItem.shearHit((Player) damager, (Player) victim, event);
+					bandageItem.shearHit((Player) damager, (Player) victim);
 					return;
 				case INK_SACK:
 					// Yay! Magic numbers!
 					// 1 = Red dye, 10 = Lime dye
-					if (item.getData().getData() == 1) {
-						bandageItem.ointmentHit((Player)damager, (Player)victim, 1, event);
-					} else if (item.getData().getData() == 10) {
-						bandageItem.ointmentHit((Player)damager, (Player)victim, 0, event);
+					if (item.getData().getData() == 1 || item.getData().getData() == 10) {
+						bandageItem.ointmentHit((Player)damager, (Player)victim, item.getData().getData());
 					}
 					return;
 				case IRON_SWORD:
-					if (item.hasItemMeta()){
+					if (item.hasItemMeta()) {
 						legendaryHandler(item, event);
 					}
 					break;
@@ -164,6 +164,10 @@ public class PlayerListeners implements Listener {
     			}
     		}
     	}
+
+    	// If we've made it this far, any remaining items used were meant to do damage
+    	event.setCancelled(false);
+
     	if (victim instanceof Player) {
     		bandageItem.bleedingInfection(victim, damager);
     	}
